@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button"
 import tmacLogo from "@/assets/tmaclogo.png"
 
 const navLinks = [
-  { href: "#home", label: "Home" },
-  { href: "#products", label: "Products" },
-  { href: "#industries", label: "Industries" },
-  { href: "#about", label: "About" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#home", label: "Home" },
+  { href: "/products", label: "Products" },
+  { href: "/#industries", label: "Industries" },
+  { href: "/#about", label: "About" },
+  { href: "/#contact", label: "Contact" },
 ]
 
 export function Header() {
@@ -54,10 +54,10 @@ export function Header() {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-4">
             <Button variant="outline" size="sm" asChild>
-              <Link href="#products">Browse Products</Link>
+              <Link href="/products">Browse Products</Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="#contact">Request a Quote</Link>
+              <Link href="/#contact">Request a Quote</Link>
             </Button>
           </div>
 
@@ -88,10 +88,10 @@ export function Header() {
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="#products">Browse Products</Link>
+                  <Link href="/products">Browse Products</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="#contact">Request a Quote</Link>
+                  <Link href="/#contact">Request a Quote</Link>
                 </Button>
               </div>
             </nav>

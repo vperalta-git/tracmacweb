@@ -25,10 +25,10 @@ export function Hero() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button size="lg" asChild>
-                <Link href="#products">View Products</Link>
+                <Link href="/products">View Products</Link>
               </Button>
               <Button size="lg" variant="outline" className="bg-transparent border-background/30 text-background hover:bg-background/10 hover:text-background" asChild>
-                <Link href="#contact">Get a Quote</Link>
+                <Link href="/#contact">Get a Quote</Link>
               </Button>
             </div>
 

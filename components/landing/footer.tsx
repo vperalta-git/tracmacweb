@@ -5,21 +5,21 @@ import tmacLogo from "@/assets/tmaclogo.png"
 
 const footerLinks = {
   products: [
-    { label: "Hard Hats", href: "#products" },
-    { label: "Safety Vests", href: "#products" },
-    { label: "Protective Gloves", href: "#products" },
-    { label: "Safety Boots", href: "#products" },
-    { label: "Full Catalog", href: "#products" },
+    { label: "Head Protection", href: "/products" },
+    { label: "Workwear", href: "/products" },
+    { label: "Hand Protection", href: "/products" },
+    { label: "Foot Protection", href: "/products" },
+    { label: "Full Catalog", href: "/products" },
   ],
   industries: [
-    { label: "Construction", href: "#industries" },
-    { label: "Mining", href: "#industries" },
-    { label: "Manufacturing", href: "#industries" },
-    { label: "Warehousing", href: "#industries" },
+    { label: "Construction", href: "/#industries" },
+    { label: "Mining", href: "/#industries" },
+    { label: "Manufacturing", href: "/#industries" },
+    { label: "Warehousing", href: "/#industries" },
   ],
   company: [
-    { label: "About Us", href: "#about" },
-    { label: "Contact", href: "#contact" },
+    { label: "About Us", href: "/#about" },
+    { label: "Contact", href: "/#contact" },
     { label: "Careers", href: "#" },
     { label: "Blog", href: "#" },
   ],

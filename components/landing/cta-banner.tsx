@@ -23,7 +23,7 @@ export function CTABanner() {
 
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
-              <Link href="#contact" className="flex items-center gap-2">
+              <Link href="/#contact" className="flex items-center gap-2">
                 Request a Quote Today
                 <ArrowRight className="h-5 w-5" />
               </Link>
