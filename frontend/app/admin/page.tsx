@@ -1,6 +1,7 @@
 "use client"
 
-import { FormEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
+import type { FormEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ImagePlus, LogOut, PackagePlus, Pencil, ShieldCheck, Trash2, X } from "lucide-react"
@@ -12,7 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { productCategories, type CatalogProduct } from "@/lib/product-data"
+import { productCategories } from "@/lib/product-data"
+import type { CatalogProduct } from "@/lib/product-data"
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -65,7 +67,7 @@ export default function AdminPage() {
     }
 
     setIsAuthenticated(true)
-    setMessage("Welcome back! You can add products now.")
+    setMessage("Welcome back. You can add products now.")
     await loadAdminProducts()
   }
 
@@ -121,9 +123,9 @@ export default function AdminPage() {
     const savedProduct = data.product
 
     if (savedProduct) {
-      setProducts((currentProducts) =>
+      setProducts((currentProducts: CatalogProduct[]) =>
         editingProduct
-          ? currentProducts.map((product) => (product.id === savedProduct.id ? savedProduct : product))
+          ? currentProducts.map((product: CatalogProduct) => (product.id === savedProduct.id ? savedProduct : product))
           : [savedProduct, ...currentProducts],
       )
     }
@@ -157,7 +159,9 @@ export default function AdminPage() {
       return
     }
 
-    setProducts((currentProducts) => currentProducts.filter((item) => item.id !== product.id))
+    setProducts((currentProducts: CatalogProduct[]) =>
+      currentProducts.filter((item: CatalogProduct) => item.id !== product.id),
+    )
 
     if (editingProduct?.id === product.id) {
       setEditingProduct(null)
@@ -215,7 +219,9 @@ export default function AdminPage() {
                       <Input id="password" name="password" type="password" autoComplete="current-password" required />
                     </div>
                     {message && <p className="text-sm text-destructive">{message}</p>}
-                    <Button className="w-full" type="submit">Login</Button>
+                    <Button className="w-full" type="submit">
+                      Login
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
@@ -345,7 +351,16 @@ export default function AdminPage() {
                       </div>
 
                       {message && (
-                        <p className={message.includes("saved") || message.includes("updated") || message.includes("deleted") || message.includes("Welcome") ? "text-sm text-primary" : "text-sm text-destructive"}>
+                        <p
+                          className={
+                            message.includes("saved") ||
+                            message.includes("updated") ||
+                            message.includes("deleted") ||
+                            message.includes("Welcome")
+                              ? "text-sm text-primary"
+                              : "text-sm text-destructive"
+                          }
+                        >
                           {message}
                         </p>
                       )}
