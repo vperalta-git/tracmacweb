@@ -15,3 +15,7 @@ node_modules
 .next/
 tsconfig.tsbuildinfo
 .DS_Store
+next-*-dev.log
+next-*-dev.err.log
+data/
+public/uploads/products/

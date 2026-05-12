@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
   Anchor,
@@ -23,176 +23,69 @@ import { Footer } from "@/components/landing/footer"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-
-type Product = {
-  name: string
-  spec: string
-  badge?: string
-}
-
-type ProductCategory = {
-  name: string
-  description: string
-  icon: LucideIcon
-  products: Product[]
-}
+import { productCategories, type CatalogProduct, type ProductCategoryName } from "@/lib/product-data"
 
 const ALL_PRODUCTS = "All Products"
 
-const categories: ProductCategory[] = [
-  {
-    name: "Foot Protection",
-    description: "Safety footwear for daily site work, wet floors, and heavy-duty industrial environments.",
-    icon: Footprints,
-    products: [
-      { name: "SteelGuard Lace-Up Safety Boots", spec: "Steel toe, oil-resistant outsole" },
-      { name: "CompositeStep Lightweight Shoes", spec: "Composite toe, anti-slip sole" },
-      { name: "RainShield PVC Safety Boots", spec: "Waterproof, chemical-resistant finish" },
-    ],
-  },
-  {
-    name: "Head Protection",
-    description: "Hard hats, bump caps, and helmet accessories for construction and industrial sites.",
-    icon: HardHat,
-    products: [
-      { name: "ProShell Vented Hard Hat", spec: "Ratchet suspension, Type I shell" },
-      { name: "ImpactLite Bump Cap", spec: "Low-profile insert, breathable cap" },
-      { name: "FullBrim Safety Helmet", spec: "Wide brim, electrical insulation" },
-    ],
-  },
-  {
-    name: "Fall Protection",
-    description: "Harnesses, lanyards, and anchors for elevated work and controlled access zones.",
-    icon: Anchor,
-    products: [
-      { name: "FallSafe Full Body Harness", spec: "D-ring back support, adjustable straps" },
-      { name: "TwinFlex Shock Lanyard", spec: "Double-leg, energy absorbing" },
-      { name: "AnchorPoint Temporary Lifeline", spec: "Portable system for site setup" },
-    ],
-  },
-  {
-    name: "Eye and Face Protection",
-    description: "Safety glasses, goggles, and shields for impact, splash, and dust protection.",
-    icon: Eye,
-    products: [
-      { name: "ClearView Anti-Fog Goggles", spec: "Indirect vent, splash guard" },
-      { name: "ImpactPro Safety Glasses", spec: "Scratch-resistant clear lens" },
-      { name: "FaceGuard Flip-Up Shield", spec: "Full-face visor, brow guard" },
-    ],
-  },
-  {
-    name: "Hearing Protection",
-    description: "Earplugs and earmuffs for high-noise production lines and machinery areas.",
-    icon: Ear,
-    products: [
-      { name: "NoiseGuard Pro Earmuffs", spec: "Adjustable headband, NRR 31dB" },
-      { name: "SoftSeal Corded Earplugs", spec: "Reusable silicone, carry case" },
-      { name: "Helmet-Mount Ear Defenders", spec: "Hard-hat compatible cups" },
-    ],
-  },
-  {
-    name: "Respiratory Protection",
-    description: "Masks and respirators for dust, fumes, and airborne particulate control.",
-    icon: Wind,
-    products: [
-      { name: "AirPure N95 Disposable Mask", spec: "Cup style, nose clip seal" },
-      { name: "DualFilter Half-Face Respirator", spec: "Replaceable cartridge design" },
-      { name: "DustBlock Foldable Mask", spec: "Flat-fold, exhalation valve" },
-    ],
-  },
-  {
-    name: "Hand Protection",
-    description: "Work gloves for cut resistance, grip, chemical handling, and general protection.",
-    icon: Hand,
-    products: [
-      { name: "CutShield Level 5 Gloves", spec: "Cut-resistant liner, coated palm" },
-      { name: "GripMax Nitrile Work Gloves", spec: "Textured palm, breathable back" },
-      { name: "ChemBlock PVC Gloves", spec: "Extended cuff, liquid protection" },
-    ],
-  },
-  {
-    name: "Workwear",
-    description: "Durable uniforms, coveralls, and high-visibility garments for daily operations.",
-    icon: Shirt,
-    products: [
-      { name: "HiVis Reflective Safety Vest", spec: "Class 2 reflective tape" },
-      { name: "Utility Cotton Coverall", spec: "Multi-pocket, reinforced seams" },
-      { name: "WorkPro Cargo Pants", spec: "Heavy-duty fabric, knee pockets" },
-    ],
-  },
-  {
-    name: "Outdoor Wear",
-    description: "Weather-ready gear for field crews, logistics teams, and exposed work areas.",
-    icon: Mountain,
-    products: [
-      { name: "StormLine Waterproof Jacket", spec: "Sealed seams, reflective trim" },
-      { name: "SunGuard Cooling Arm Sleeves", spec: "UV protection, quick-dry fabric" },
-      { name: "FieldReady Rain Pants", spec: "Waterproof shell, elastic waist" },
-    ],
-  },
-  {
-    name: "Technical Wear",
-    description: "Specialized protective apparel for welding, electrical, and heat-risk work.",
-    icon: BriefcaseBusiness,
-    products: [
-      { name: "ArcSafe FR Coverall", spec: "Flame-resistant, arc-rated fabric" },
-      { name: "WeldGuard Leather Apron", spec: "Heat-resistant split leather" },
-      { name: "ThermoShield Sleeve Pair", spec: "Heat barrier for forearm protection" },
-    ],
-  },
-  {
-    name: "Disposable Wear",
-    description: "Single-use coveralls, masks, caps, and shoe covers for clean or controlled zones.",
-    icon: Trash2,
-    products: [
-      { name: "CleanZone Disposable Coverall", spec: "Elastic hood, cuffs, and ankles" },
-      { name: "PolyShield Shoe Covers", spec: "Non-skid sole, elastic opening" },
-      { name: "VisitorGuard Bouffant Cap", spec: "Lightweight, breathable material" },
-    ],
-  },
-  {
-    name: "ESD",
-    description: "Static-control equipment for electronics, assembly, and sensitive production floors.",
-    icon: Shield,
-    products: [
-      { name: "StaticSafe ESD Wrist Strap", spec: "Adjustable band, coiled cord" },
-      { name: "ESD Workbench Mat", spec: "Grounding snap, dissipative surface" },
-      { name: "Anti-Static Lab Coat", spec: "Conductive grid fabric" },
-    ],
-  },
-  {
-    name: "W/ DOLE Certificate",
-    description: "Certified PPE and documentation-ready items for compliance-focused procurement.",
-    icon: BadgeCheck,
-    products: [
-      { name: "Certified Industrial Safety Kit", spec: "Includes DOLE document support" },
-      { name: "Compliance-Ready PPE Bundle", spec: "Helmet, vest, gloves, and goggles" },
-      { name: "Site Audit Starter Pack", spec: "Documentation support and sample PPE set" },
-    ],
-  },
-]
+const categoryIcons: Record<ProductCategoryName, LucideIcon> = {
+  "Foot Protection": Footprints,
+  "Head Protection": HardHat,
+  "Fall Protection": Anchor,
+  "Eye and Face Protection": Eye,
+  "Hearing Protection": Ear,
+  "Respiratory Protection": Wind,
+  "Hand Protection": Hand,
+  Workwear: Shirt,
+  "Outdoor Wear": Mountain,
+  "Technical Wear": BriefcaseBusiness,
+  "Disposable Wear": Trash2,
+  ESD: Shield,
+  "W/ DOLE Certificate": BadgeCheck,
+}
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState(ALL_PRODUCTS)
+  const [products, setProducts] = useState<CatalogProduct[]>([])
+
+  useEffect(() => {
+    let ignore = false
+
+    async function loadProducts() {
+      try {
+        const response = await fetch("/api/products", { cache: "no-store" })
+
+        if (!response.ok) {
+          return
+        }
+
+        const data = (await response.json()) as { products?: CatalogProduct[] }
+
+        if (!ignore && Array.isArray(data.products)) {
+          setProducts(data.products)
+        }
+      } catch {
+        setProducts([])
+      }
+    }
+
+    loadProducts()
+
+    return () => {
+      ignore = true
+    }
+  }, [])
 
   const activeCategory = useMemo(
-    () => categories.find((category) => category.name === selectedCategory),
+    () => productCategories.find((category) => category.name === selectedCategory),
     [selectedCategory],
   )
 
   const visibleProducts = useMemo(
-    () =>
-      (activeCategory ? [activeCategory] : categories).flatMap((category) =>
-        category.products.map((product) => ({
-          ...product,
-          categoryName: category.name,
-          categoryIcon: category.icon,
-        })),
-      ),
-    [activeCategory],
+    () => products.filter((product) => !activeCategory || product.category === activeCategory.name),
+    [activeCategory, products],
   )
 
-  const SectionIcon = activeCategory?.icon ?? Shield
+  const SectionIcon = activeCategory ? categoryIcons[activeCategory.name] : Shield
 
   return (
     <div className="min-h-screen bg-background">
@@ -225,7 +118,7 @@ export default function ProductsPage() {
                 className="mt-3 h-12 w-full rounded-md border border-background/20 bg-background px-4 text-sm font-medium text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/40"
               >
                 <option value={ALL_PRODUCTS}>{ALL_PRODUCTS}</option>
-                {categories.map((category) => (
+                {productCategories.map((category) => (
                   <option key={category.name} value={category.name}>
                     {category.name}
                   </option>
@@ -253,34 +146,55 @@ export default function ProductsPage() {
               </Button>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
-              {visibleProducts.map((product) => {
-                const ProductIcon = product.categoryIcon
+            {visibleProducts.length ? (
+              <div className="grid gap-6 md:grid-cols-3">
+                {visibleProducts.map((product) => {
+                  const ProductIcon = categoryIcons[product.category]
 
-                return (
-                  <Card key={product.name} className="border-border transition-shadow hover:shadow-lg">
-                    <CardContent className="p-6">
-                      <div className="mb-5 flex aspect-square items-center justify-center rounded-lg bg-muted">
-                        <ProductIcon className="h-16 w-16 text-muted-foreground/60" />
-                      </div>
-                      <div className="flex items-start justify-between gap-3">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                          {product.categoryName}
-                        </p>
-                        {product.badge && <Badge variant="secondary">{product.badge}</Badge>}
-                      </div>
-                      <h3 className="mt-2 text-lg font-semibold leading-snug text-foreground">{product.name}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground">{product.spec}</p>
-                    </CardContent>
-                    <CardFooter className="p-6 pt-0">
-                      <Button variant="outline" className="w-full" asChild>
-                        <Link href="/#contact">Request Quote</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                )
-              })}
-            </div>
+                  return (
+                    <Card key={product.id} className="border-border transition-shadow hover:shadow-lg">
+                      <CardContent className="p-6">
+                        <div className="mb-5 flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-muted">
+                          {product.imageUrl ? (
+                            <img
+                              src={product.imageUrl}
+                              alt={product.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <ProductIcon className="h-16 w-16 text-muted-foreground/60" />
+                          )}
+                        </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                            {product.category}
+                          </p>
+                          {product.badge && <Badge variant="secondary">{product.badge}</Badge>}
+                        </div>
+                        <h3 className="mt-2 text-lg font-semibold leading-snug text-foreground">{product.name}</h3>
+                        <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
+                        <p className="mt-3 text-sm font-medium text-foreground">{product.spec}</p>
+                      </CardContent>
+                      <CardFooter className="p-6 pt-0">
+                        <Button variant="outline" className="w-full" asChild>
+                          <Link href="/#contact">Request Quote</Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  )
+                })}
+              </div>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="flex min-h-52 flex-col items-center justify-center p-8 text-center">
+                  <Shield className="h-12 w-12 text-muted-foreground/60" />
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">No products available yet</h3>
+                  <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                    Products added by the admin will appear here automatically.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </section>
       </main>
