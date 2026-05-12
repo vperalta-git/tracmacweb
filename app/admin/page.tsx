@@ -64,7 +64,7 @@ export default function AdminPage() {
     }
 
     setIsAuthenticated(true)
-    setMessage("Welcome back. You can add products now.")
+    setMessage("Welcome back! You can add products now.")
     await loadAdminProducts()
   }
 
