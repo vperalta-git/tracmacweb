@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, useEffect, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { ImagePlus, LogOut, PackagePlus, Pencil, ShieldCheck, Trash2, X } from "lucide-react"
 import { Header } from "@/components/landing/header"
@@ -117,11 +118,13 @@ export default function AdminPage() {
       return
     }
 
-    if (data.product) {
+    const savedProduct = data.product
+
+    if (savedProduct) {
       setProducts((currentProducts) =>
         editingProduct
-          ? currentProducts.map((product) => (product.id === data.product!.id ? data.product! : product))
-          : [data.product!, ...currentProducts],
+          ? currentProducts.map((product) => (product.id === savedProduct.id ? savedProduct : product))
+          : [savedProduct, ...currentProducts],
       )
     }
 
@@ -310,7 +313,14 @@ export default function AdminPage() {
                           className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 p-6 text-center transition hover:border-primary/50 hover:bg-primary/5"
                         >
                           {previewUrl ? (
-                            <img src={previewUrl} alt="Selected product preview" className="max-h-56 rounded-md object-contain" />
+                            <Image
+                              src={previewUrl}
+                              alt="Selected product preview"
+                              width={224}
+                              height={224}
+                              unoptimized
+                              className="max-h-56 rounded-md object-contain"
+                            />
                           ) : (
                             <>
                               <ImagePlus className="h-10 w-10 text-muted-foreground" />
@@ -357,7 +367,14 @@ export default function AdminPage() {
                           <div key={product.id} className="flex gap-3 rounded-lg border border-border p-3">
                             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
                               {product.imageUrl ? (
-                                <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                                <Image
+                                  src={product.imageUrl}
+                                  alt={product.name}
+                                  width={64}
+                                  height={64}
+                                  unoptimized
+                                  className="h-full w-full object-cover"
+                                />
                               ) : (
                                 <PackagePlus className="h-6 w-6 text-muted-foreground" />
                               )}
