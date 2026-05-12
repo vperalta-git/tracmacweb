@@ -23,6 +23,7 @@ import { Footer } from "@/components/landing/footer"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { getLocalCatalogProducts } from "@/lib/local-product-store"
 import { productCategories, type CatalogProduct, type ProductCategoryName } from "@/lib/product-data"
 
 const ALL_PRODUCTS = "All Products"
@@ -48,31 +49,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<CatalogProduct[]>([])
 
   useEffect(() => {
-    let ignore = false
-
-    async function loadProducts() {
-      try {
-        const response = await fetch("/api/products", { cache: "no-store" })
-
-        if (!response.ok) {
-          return
-        }
-
-        const data = (await response.json()) as { products?: CatalogProduct[] }
-
-        if (!ignore && Array.isArray(data.products)) {
-          setProducts(data.products)
-        }
-      } catch {
-        setProducts([])
-      }
-    }
-
-    loadProducts()
-
-    return () => {
-      ignore = true
-    }
+    setProducts(getLocalCatalogProducts())
   }, [])
 
   const activeCategory = useMemo(

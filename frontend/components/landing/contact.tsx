@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import { sendContactMessage } from "@/lib/email"
 
 const contactInfo = [
   {
@@ -41,12 +42,30 @@ export function Contact() {
     phone: "",
     message: "",
   })
+  const [isSending, setIsSending] = useState(false)
+  const [statusMessage, setStatusMessage] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Form submission logic would go here
-    console.log("Form submitted:", formData)
-    alert("Thank you for your inquiry! We will get back to you within 24 hours.")
+
+    setIsSending(true)
+    setStatusMessage("")
+
+    try {
+      await sendContactMessage(formData)
+      setStatusMessage("Your message was sent successfully. We will get back to you within 24 hours.")
+      setFormData({
+        name: "",
+        company: "",
+        email: "",
+        phone: "",
+        message: "",
+      })
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : "Unable to send your message right now.")
+    } finally {
+      setIsSending(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -176,8 +195,14 @@ export function Contact() {
                   </div>
 
                   <Button type="submit" size="lg" className="w-full sm:w-auto">
-                    Submit Inquiry
+                    {isSending ? "Sending..." : "Submit Inquiry"}
                   </Button>
+
+                  {statusMessage && (
+                    <p className="text-sm text-muted-foreground" aria-live="polite">
+                      {statusMessage}
+                    </p>
+                  )}
 
                   <p className="text-sm text-muted-foreground">
                     * Required fields. We typically respond within 24 business hours.
