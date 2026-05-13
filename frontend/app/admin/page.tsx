@@ -184,7 +184,7 @@ export default function AdminPage() {
                   Manage the TRACMAC product catalog
                 </h1>
                 <p className="mt-4 max-w-2xl text-lg text-background/75">
-                  Add product names, images, descriptions, categories, and key specifications directly to the live catalog.
+                  Add product names, images, descriptions, categories, and key specifications directly to the live catalog
                 </p>
               </div>
               <Button variant="secondary" asChild>
