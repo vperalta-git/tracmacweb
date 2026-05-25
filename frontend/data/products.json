@@ -1,0 +1,388 @@
+[
+  {
+    "id": "delta-plus-zircon-1",
+    "name": "Zircon 1",
+    "category": "Head Protection",
+    "brand": "Delta Plus",
+    "description": "UV-resistant HDPE and PP safety helmet with an 8-point LDPE cradle, manual size adjustment, and accessory-ready side slots.",
+    "spec": "Head size 53-63 cm; electrical insulation up to 1,000 V AC / 1,500 V DC; chin strap anchorage with 2 or 4 points; colors: white, grey, yellow, orange, red, green",
+    "imageUrl": "/products/delta-plus/head/zircon-1.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-quartz-up-iii",
+    "name": "Quartz Up III",
+    "category": "Head Protection",
+    "brand": "Delta Plus",
+    "description": "UV-resistant PP safety helmet with a 3-textile-strap polyamide cradle, foam sweat band, and adjustable ROTOR fit system.",
+    "spec": "Head size 53-63 cm; top/low headband positions; electrical insulation up to 1,000 V AC / 1,500 V DC; colors: white, blue, grey-yellow, black, orange, yellow, red, green",
+    "imageUrl": "/products/delta-plus/head/quartz-up-iii.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-quartz-up-iv",
+    "name": "Quartz Up IV",
+    "category": "Head Protection",
+    "brand": "Delta Plus",
+    "description": "Ventilated UV-resistant PP safety helmet with an 8-point polyamide textile cradle, foam sweat band, and adjustable ROTOR system.",
+    "spec": "Head size 53-63 cm; high/low headband positions; EN397 / EN50365; colors: white, blue, yellow, orange, red, green",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-granite-peak",
+    "name": "Granite Peak",
+    "category": "Head Protection",
+    "brand": "Delta Plus",
+    "description": "ABS mountain-style safety helmet with a 3-point chin strap and adjustable ROTOR system for secure work-at-height protection.",
+    "spec": "+50 C / -20 C; MM; 440 VAC; electrical insulation to EN50365",
+    "imageUrl": "/products/delta-plus/head/granite-peak.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-harness-z",
+    "name": "Harness Z",
+    "category": "Head Protection",
+    "brand": "Delta Plus",
+    "description": "Pack of 10 spare harness sets designed as replacement suspension assemblies for Zircon safety helmets.",
+    "spec": "Pack of 10 spare harnesses for Zircon helmets",
+    "imageUrl": "/products/delta-plus/head/harness-z.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-dynamic-jugalpha",
+    "name": "Dynamic Jugalpha",
+    "category": "Head Protection",
+    "brand": "Delta Plus",
+    "description": "Bag of 10 four-point chin straps compatible with Quartz, Zircon, and Baseball Diamond helmet ranges.",
+    "spec": "Bag of 10 chin straps; 4 fixing points; fits Quartz, Zircon, and Baseball Diamond",
+    "imageUrl": "/products/delta-plus/head/dynamic-jugalpha.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-air-coltan",
+    "name": "Air Coltan",
+    "category": "Head Protection",
+    "brand": "Delta Plus",
+    "description": "Impact-resistant baseball-style bump cap with strong ventilation, mesh comfort zones, and an EVA foam-reinforced inner shell.",
+    "spec": "Adjustable size 55-62 cm; polyurethane-coated polyester exterior; HDPE inner shell with foam reinforcement; colors: navy blue-orange, grey-yellow, fluorescent yellow-grey, black-red",
+    "imageUrl": "/products/delta-plus/head/air-coltan.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-amazone-s5-sra",
+    "name": "AMAZONE S5 SRA",
+    "category": "Foot Protection",
+    "brand": "Delta Plus",
+    "description": "PVC safety boot with injected PVC/nitrile outsole built for wet and demanding work environments.",
+    "spec": "Upper: PVC; no lining; no insole; outsole: injected PVC/nitrile; size range: 36-47",
+    "imageUrl": "/products/delta-plus/footwear/amazone-s5-sra.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-delta-sport-s1p-src",
+    "name": "DELTA SPORT S1P SRC",
+    "category": "Foot Protection",
+    "brand": "Delta Plus",
+    "description": "Non-metallic safety footwear with injected PU on mesh upper and nitrile rubber outsole in a sporty black-red build.",
+    "spec": "Upper: injected PU on mesh; lining: polyester; removable premolded polyester on EVA insole; cemented phylon midsole; rubber nitrile outsole; color: black-red; size range: 39-47 EU",
+    "imageUrl": "/products/delta-plus/footwear/delta-sport-s1p-src.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-gargas3-eh",
+    "name": "GARGAS3 EH",
+    "category": "Foot Protection",
+    "brand": "Delta Plus",
+    "description": "Breathable black electrical-hazard safety shoe with composite toe and anti-perforation protection.",
+    "spec": "Polyamide mesh breathable lining; EVA-polyester footbed; PU 2D injection-molded outsole; composite anti-perforation insert; composite safety toe-cap; EH rated; color: black",
+    "imageUrl": "/products/delta-plus/footwear/gargas3-eh.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-miami-s2-src",
+    "name": "MIAMI S2 SRC",
+    "category": "Foot Protection",
+    "brand": "Delta Plus",
+    "description": "Water-resistant microfiber safety shoe with easy-care construction and a removable EVA-based in-sock.",
+    "spec": "Upper: microfiber/PU; removable premolded polyester on EVA in-sock; injected single-density PU midsole; machine washable up to 30 C",
+    "imageUrl": "/products/delta-plus/footwear/miami-s2-src.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-tw402-s3-src",
+    "name": "TW402 S3 SRC",
+    "category": "Foot Protection",
+    "brand": "Delta Plus",
+    "description": "Full-grain leather S3 safety footwear with water-resistant treatment, reinforced toe and heel, and Panoshock shock absorption.",
+    "spec": "Full-grain leather upper; S3 water-resistant treatment; premolded front and back reinforcements; polyamide absorbing lining; removable premolded polyester on PU insole; cemented PU midsole with Panoshock shock absorber; rubber nitrile outsole; non-metallic; size range: 39-48",
+    "imageUrl": "/products/delta-plus/footwear/tw402-s3-src.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-saga2-s3s-sr",
+    "name": "SAGA2 S3S SR",
+    "category": "Foot Protection",
+    "brand": "Delta Plus",
+    "description": "Nubuck leather S3S safety footwear with water-resistant treatment and a cemented PU/rubber outsole.",
+    "spec": "Nubuck leather upper with S3 water-resistant treatment; polyester lining; removable polyester on EVA insole; cemented PU/rubber outsole; EN ISO 20344:2011; EN ISO 20345:2011; ASTM F 2413:2011",
+    "imageUrl": "/products/delta-plus/footwear/saga2-s3s-sr.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-brava2soft",
+    "name": "BRAVA2Soft",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Lightweight safety glasses with flat spatula arms, side protection, and an integrated polycarbonate nose piece for easy use with helmets and ear defenders.",
+    "spec": "Frame and lens: polycarbonate; integrated nose piece; weight: 25 g",
+    "imageUrl": "/products/delta-plus/eye-and-face/brava2soft.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-meia",
+    "name": "MEIA",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Single-lens polycarbonate glasses with integrated nose piece, polycarbonate arms, and non-slip PVC tips.",
+    "spec": "Colors: clear, dark, or smoke; CE EN166 / EN170-172",
+    "imageUrl": "/products/delta-plus/eye-and-face/meia.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-aso2",
+    "name": "ASO2",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Sport-design polycarbonate glasses with flexible bi-material arms and a nose piece shaped for a wide range of users.",
+    "spec": "Polycarbonate / TPR arms; anti-fog; anti-scratch",
+    "imageUrl": "/products/delta-plus/eye-and-face/aso2.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-fuji2",
+    "name": "FUJI2",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Twin-lens polycarbonate glasses with twin-material arms, soft tips, and a soft TPE nose piece for comfort.",
+    "spec": "Twin polycarbonate lenses; soft TPE nose piece; also available with gradient lens",
+    "imageUrl": "/products/delta-plus/eye-and-face/fuji2.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-vulcano2",
+    "name": "VULCANO2",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Single-lens polycarbonate glasses with adjustable tilting nylon arms, spatula tips, and integrated TPE nose support.",
+    "spec": "Side protections; EN166 / EN170 UV 2C-1.2; ANSI Z87.1; available in dark or clear",
+    "imageUrl": "/products/delta-plus/eye-and-face/vulcano2.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-kilimandjaro",
+    "name": "KILIMANDJARO",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Indirect-ventilated polycarbonate goggles with a flexible PVC and nylon frame sized to fit over glasses and disposable half-mask respirators.",
+    "spec": "Indirect ventilation; wide elastic strap; compatible with eyewear and disposable respiratory half-masks",
+    "imageUrl": "/products/delta-plus/eye-and-face/kilimandjaro.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-galeras",
+    "name": "GALERAS",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Indirect-ventilated polycarbonate goggles with a flexible PVC and nylon frame designed to wear over glasses and disposable half-mask respirators.",
+    "spec": "Indirect ventilation; wide elastic strap; compatible with eyewear and disposable respiratory half-masks",
+    "imageUrl": "/products/delta-plus/eye-and-face/galeras.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-muria1",
+    "name": "MURIA1",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Clear polycarbonate goggles with a flexible PVC frame, direct ventilation, and a textile elastic headband.",
+    "spec": "Clear polycarbonate monobloc lens; optical class 1; colorless PVC frame; PVC nose pad; vented eyebrow protection; weight: 60 g",
+    "imageUrl": "/products/delta-plus/eye-and-face/muria1.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-casoud3",
+    "name": "CASOUD3",
+    "category": "Eye and Face Protection",
+    "brand": "Delta Plus",
+    "description": "Black polypropylene welding goggle with lift-front lens holder, moisture resistance, and durable impact protection.",
+    "spec": "Lens size: 108 x 51 mm (4.25 x 2 in); complies with CE EN175, ANSI Z87, and CSA Z94.3",
+    "imageUrl": "/products/delta-plus/eye-and-face/casoud3.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-ve702gr",
+    "name": "VE702GR",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "13-gauge polyamide knitted glove with polyurethane coating on the palm and fingertips for lightweight handling work.",
+    "spec": "100% polyamide support; polyurethane palm and fingertip coating; gauge 13; EN388:2016; EN420:2003+A1:2009",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-ve712gr",
+    "name": "VE712GR",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "13-gauge polyester glove with nitrile coating on the palm and fingertips in a grey-black finish.",
+    "spec": "100% polyester support; nitrile palm and fingertip coating; gauge 13; color: grey-black",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-ve726",
+    "name": "VE726",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "15-gauge polyamide and spandex knitted glove with nitrile and polyurethane palm coating for dexterity and grip.",
+    "spec": "Grey-black; nitrile/polyurethane palm and fingertip coating; gauge 15; sizes 07/08/09/10; EN420:2003+A1:2009; EN388:2016",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-ve727",
+    "name": "VE727",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "15-gauge polyamide spandex glove with nitrile and polyurethane coating plus nitrile dots on the palm for extra grip.",
+    "spec": "Grey-black; nitrile/polyurethane palm and fingertip coating; nitrile dots on palm; gauge 15; sizes 07/08/09/10; EN420:2003+A1:2009; EN388:2016",
+    "imageUrl": "/products/delta-plus/hand/ve727.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-vecutb04g3",
+    "name": "VECUTB04G3",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "ECONOCUT high-performance fiber glove with nitrile-coated palm and fingertips for cut-aware handling tasks.",
+    "spec": "High performance fibre support; nitrile palm and fingertip coating; gauge 13; EN420:2003+A1:2009; EN388:2016; ANSI-ISEA 105:2016",
+    "imageUrl": "/products/delta-plus/hand/vecutb04g3.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-fbn49",
+    "name": "FBN49",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "American-assembly cowhide full-grain leather glove built for durable mechanical protection.",
+    "spec": "Cowhide full-grain leather; thickness 0.9-1.1 mm; sizes 07/08/09/10/11; EN388:2016+A1:2018",
+    "imageUrl": "/products/delta-plus/hand/fbn49.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-fcn29",
+    "name": "FCN29",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "Leather work glove with cowhide grain palm, full index, and split leather back in an American-assembly build.",
+    "spec": "Cowhide grain leather palm; split leather back; palm and back thickness 0.9-1.1 mm; full index design",
+    "imageUrl": "/products/delta-plus/hand/fcn29.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-ca615k",
+    "name": "CA615K",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "Heat-resistant split cowhide glove with cotton fleece hand lining and canvas-lined cuff for welding and hot-work tasks.",
+    "spec": "Length 35 cm; heat-resistant treated split cowhide leather 1.2-1.4 mm; batting hand lining; 300 g/m² cotton cuff lining; EN420:2003+A1:2009; EN388:2016; EN407:2004; EN12477",
+    "imageUrl": "/products/delta-plus/hand/ca615k.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-terk400",
+    "name": "TERK400",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "Thermal aluminized leather glove for extreme-heat exposure in heavy-industry applications.",
+    "spec": "Split cow leather construction; aramid-polyester lining; aluminized cuff; glove length 400 mm; cuff length 200 mm; elbow cuff protection; azo free",
+    "imageUrl": "/products/delta-plus/hand/terk400.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-ve730",
+    "name": "VE730",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "Single-coated latex glove with wrinkled grip-textured palm on a weft-yarn polyester support.",
+    "spec": "Palm coating; single latex coating; wrinkled grip texture; polyester fiber support",
+    "imageUrl": "/products/delta-plus/hand/ve730.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-tc716",
+    "name": "TC716",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "Cow split-leather glove with leather palm and back for rugged general-purpose handling.",
+    "spec": "Cow leather; split leather finish; leather support; split-leather palm and back",
+    "imageUrl": "/products/delta-plus/hand/tc716.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-nitrex-ve801",
+    "name": "NITREX VE801",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "Single-coated nitrile glove with a smooth finish and flocked interior for chemical and maintenance work.",
+    "spec": "Single nitrile coating; smooth finish; flocked inner finish",
+    "imageUrl": "/products/delta-plus/hand/nitrex-ve801.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-chemsafe-vv835",
+    "name": "CHEMSAFE VV835",
+    "category": "Hand Protection",
+    "brand": "Delta Plus",
+    "description": "Triple-coated nitrile glove with a foam-rough grip texture for stronger hold in chemical-handling environments.",
+    "spec": "Triple nitrile coating; grip-textured foam-rough finish",
+    "imageUrl": "/products/delta-plus/hand/chemsafe-vv835.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-interlagos2",
+    "name": "INTERLAGOS2",
+    "category": "Hearing Protection",
+    "brand": "Delta Plus",
+    "description": "Over-the-head ear defenders with ABS cups, synthetic foam cushions, and a padded flexible headband with height adjustment.",
+    "spec": "ABS cups; synthetic foam cushions; ABS over-the-head support; weight: 200 g",
+    "imageUrl": "/products/delta-plus/hearing/interlagos2.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-suzuka2",
+    "name": "SUZUKA2",
+    "category": "Hearing Protection",
+    "brand": "Delta Plus",
+    "description": "Helmet-mounted ear defenders with adjustable height, flexible ABS arms, and padded cups for use alone or with visor holders.",
+    "spec": "ABS cups and arms; PVC and synthetic foam cushions; helmet-mounted support; suitable for GRANITE, SUPER QUARTZ, QUARTZ, ZIRCON, and BASEBALL DIAMOND helmets; weight: 252 g",
+    "imageUrl": "/products/delta-plus/hearing/suzuka2.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-spa3",
+    "name": "SPA3",
+    "category": "Hearing Protection",
+    "brand": "Delta Plus",
+    "description": "Lightweight ear defenders with low-pressure pads, adjustable ABS headband, and cushioned cups for everyday noise protection.",
+    "spec": "Polystyrene and synthetic foam cups; PU foam cushions; ABS over-the-head support; weight: 155 g",
+    "imageUrl": "/products/delta-plus/hearing/spa3.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "delta-plus-conic2v200",
+    "name": "CONIC2V200",
+    "category": "Hearing Protection",
+    "brand": "Delta Plus",
+    "description": "Dispenser box of 200 pairs of PU foam earplugs for convenient high-volume hearing protection use.",
+    "spec": "200 pairs per dispenser box; PU foam earplugs; SNR 37 dB",
+    "imageUrl": "/products/delta-plus/hearing/conic2v200.png",
+    "createdAt": "2026-05-25T00:00:00.000Z"
+  }
+]
