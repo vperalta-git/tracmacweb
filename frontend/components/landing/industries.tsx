@@ -53,17 +53,25 @@ export function Industries() {
           {industries.map((industry) => (
             <div
               key={industry.title}
-              className="group bg-card rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 border border-border"
+              className="group overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-md"
             >
-              <div className="h-14 w-14 rounded-xl bg-foreground flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                <industry.icon className="h-7 w-7 text-primary" />
+              <div className="relative flex aspect-[16/9] items-center justify-center bg-foreground">
+                <div className="absolute inset-0 opacity-10" style={{
+                  backgroundImage: "linear-gradient(135deg, transparent 0 45%, white 45% 50%, transparent 50% 100%)",
+                  backgroundSize: "28px 28px",
+                }} />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg">
+                  <industry.icon className="h-8 w-8" />
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                {industry.title}
-              </h3>
-              <p className="text-muted-foreground">
-                {industry.description}
-              </p>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-foreground mb-3">
+                  {industry.title}
+                </h3>
+                <p className="text-muted-foreground">
+                  {industry.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>

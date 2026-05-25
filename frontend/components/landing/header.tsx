@@ -1,11 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import tmacLogo from "@/assets/tmaclogo.png"
+import { cn } from "@/lib/utils"
+import { QuoteLink } from "@/components/quote-link"
 
 const navLinks = [
   { href: "/#home", label: "Home" },
@@ -13,39 +16,63 @@ const navLinks = [
   { href: "/#industries", label: "Industries" },
   { href: "/#about", label: "About" },
   { href: "/#contact", label: "Contact" },
-  { href: "/admin", label: "Admin" },
 ]
 
 export function Header() {
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [activeHash, setActiveHash] = useState("")
+
+  useEffect(() => {
+    const updateHash = () => setActiveHash(window.location.hash)
+
+    updateHash()
+    window.addEventListener("hashchange", updateHash)
+
+    return () => window.removeEventListener("hashchange", updateHash)
+  }, [])
+
+  function isActiveLink(href: string) {
+    const [linkPath, linkHash] = href.split("#")
+
+    if (pathname === "/products") {
+      return href === "/products"
+    }
+
+    if (pathname !== (linkPath || "/")) {
+      return false
+    }
+
+    if (!linkHash) {
+      return pathname === href
+    }
+
+    return activeHash ? activeHash === `#${linkHash}` : linkHash === "home"
+  }
 
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-border bg-card/95 shadow-sm backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex min-h-28 items-center justify-between py-3 lg:min-h-32">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex items-center gap-4">
-              <Image
-                src={tmacLogo}
-                alt="TRACMAC Marketing logo"
-                className="h-24 w-24 rounded-2xl bg-white p-2 object-contain shadow-lg ring-1 ring-primary/25 lg:h-30 lg:w-30"
-                priority
-              />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-foreground lg:text-2xl">TRACMAC</span>
-                <span className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Marketing</span>
-              </div>
-            </div>
+        <div className="flex min-h-20 items-center justify-between py-3 lg:min-h-24">
+          <Link href="/" className="flex items-center">
+            <Image
+              src={tmacLogo}
+              alt="TRACMAC Marketing logo"
+              className="h-20 w-auto object-contain lg:h-24"
+              priority
+            />
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                aria-current={isActiveLink(link.href) ? "page" : undefined}
+                className={cn(
+                  "rounded-md px-3 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-primary/10 hover:text-primary",
+                  isActiveLink(link.href) && "bg-primary/15 text-primary",
+                )}
               >
                 {link.label}
               </Link>
@@ -58,7 +85,7 @@ export function Header() {
               <Link href="/products">Browse Products</Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/#contact">Request a Quote</Link>
+              <QuoteLink>Request a Quote</QuoteLink>
             </Button>
           </div>
 
@@ -81,7 +108,11 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors px-2 py-1"
+                  aria-current={isActiveLink(link.href) ? "page" : undefined}
+                  className={cn(
+                    "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-primary/10 hover:text-primary",
+                    isActiveLink(link.href) && "bg-primary/15 text-primary",
+                  )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}
@@ -92,7 +123,7 @@ export function Header() {
                   <Link href="/products">Browse Products</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/#contact">Request a Quote</Link>
+                  <QuoteLink onClick={() => setMobileMenuOpen(false)}>Request a Quote</QuoteLink>
                 </Button>
               </div>
             </nav>

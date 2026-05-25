@@ -4,15 +4,18 @@ import { useEffect, useState } from "react"
 import type { FormEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ImagePlus, LogOut, PackagePlus, Pencil, ShieldCheck, Trash2, X } from "lucide-react"
+import { HardDrive, ImagePlus, LogOut, PackagePlus, Pencil, ShieldCheck, Trash2, X } from "lucide-react"
 import { Header } from "@/components/landing/header"
 import { Footer } from "@/components/landing/footer"
+import { BrandMark } from "@/components/brand-mark"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { productBrands } from "@/lib/brand-data"
 import { productCategories } from "@/lib/product-data"
 import type { CatalogProduct } from "@/lib/product-data"
 
@@ -196,6 +199,16 @@ export default function AdminPage() {
 
         <section className="py-12 lg:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            {isAuthenticated && (
+              <Alert className="mb-6 border-primary/30 bg-primary/10">
+                <HardDrive className="h-4 w-4 text-primary" />
+                <AlertTitle>Local demo storage</AlertTitle>
+                <AlertDescription>
+                  Products are saved on this machine in local project files. Demo products stay visible until you add
+                  your own catalog items.
+                </AlertDescription>
+              </Alert>
+            )}
             {isCheckingSession ? (
               <Card>
                 <CardContent className="p-6 text-sm text-muted-foreground">Checking admin session...</CardContent>
@@ -262,6 +275,28 @@ export default function AdminPage() {
                           />
                         </div>
                         <div className="space-y-2">
+                          <Label htmlFor="brand">Brand</Label>
+                          <select
+                            id="brand"
+                            name="brand"
+                            defaultValue={editingProduct?.brand ?? ""}
+                            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm shadow-xs outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                            required
+                          >
+                            <option value="" disabled>
+                              Select brand
+                            </option>
+                            {productBrands.map((brand) => (
+                              <option key={brand.slug} value={brand.name}>
+                                {brand.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <div className="space-y-2">
                           <Label htmlFor="category">Category</Label>
                           <select
                             id="category"
@@ -277,6 +312,15 @@ export default function AdminPage() {
                             ))}
                           </select>
                         </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="badge">Badge</Label>
+                          <Input
+                            id="badge"
+                            name="badge"
+                            placeholder="Optional: New, Best Seller, Popular"
+                            defaultValue={editingProduct?.badge ?? ""}
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-2">
@@ -290,7 +334,7 @@ export default function AdminPage() {
                         />
                       </div>
 
-                      <div className="grid gap-5 md:grid-cols-2">
+                      <div className="grid gap-5 md:grid-cols-1">
                         <div className="space-y-2">
                           <Label htmlFor="spec">Specs</Label>
                           <Input
@@ -299,15 +343,6 @@ export default function AdminPage() {
                             placeholder="Example: ANSI Z87.1+, anti-fog lens"
                             defaultValue={editingProduct?.spec ?? ""}
                             required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="badge">Badge</Label>
-                          <Input
-                            id="badge"
-                            name="badge"
-                            placeholder="Optional: New, Best Seller, Popular"
-                            defaultValue={editingProduct?.badge ?? ""}
                           />
                         </div>
                       </div>
@@ -319,14 +354,19 @@ export default function AdminPage() {
                           className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 p-6 text-center transition hover:border-primary/50 hover:bg-primary/5"
                         >
                           {previewUrl ? (
-                            <Image
-                              src={previewUrl}
-                              alt="Selected product preview"
-                              width={224}
-                              height={224}
-                              unoptimized
-                              className="max-h-56 rounded-md object-contain"
-                            />
+                            <div className="relative">
+                              <Image
+                                src={previewUrl}
+                                alt="Selected product preview"
+                                width={224}
+                                height={224}
+                                unoptimized
+                                className="max-h-56 rounded-md object-contain"
+                              />
+                              <span className="mt-3 block text-xs font-medium text-muted-foreground">
+                                Click to choose a different image
+                              </span>
+                            </div>
                           ) : (
                             <>
                               <ImagePlus className="h-10 w-10 text-muted-foreground" />
@@ -348,6 +388,18 @@ export default function AdminPage() {
                             setPreviewUrl(file ? URL.createObjectURL(file) : "")
                           }}
                         />
+                        {previewUrl && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="w-fit"
+                            onClick={() => setPreviewUrl("")}
+                          >
+                            <X className="mr-2 h-4 w-4" />
+                            Clear preview
+                          </Button>
+                        )}
                       </div>
 
                       {message && (
@@ -391,12 +443,15 @@ export default function AdminPage() {
                                   className="h-full w-full object-cover"
                                 />
                               ) : (
-                                <PackagePlus className="h-6 w-6 text-muted-foreground" />
+                                <BrandMark brand={product.brand} compact />
                               )}
                             </div>
                             <div className="min-w-0">
                               <p className="truncate text-sm font-semibold text-foreground">{product.name}</p>
-                              <p className="mt-1 text-xs font-medium uppercase tracking-wider text-primary">{product.category}</p>
+                              <p className="mt-1 text-xs font-medium uppercase tracking-wider text-primary">
+                                {product.brand} / {product.category}
+                              </p>
+                              {product.isDemo && <p className="mt-1 text-xs font-medium text-muted-foreground">Demo item</p>}
                               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
                             </div>
                             <div className="ml-auto flex shrink-0 gap-1">
@@ -406,6 +461,7 @@ export default function AdminPage() {
                                 size="icon"
                                 className="h-8 w-8"
                                 title="Edit product"
+                                disabled={product.isDemo}
                                 onClick={() => handleEditProduct(product)}
                               >
                                 <Pencil className="h-4 w-4" />
@@ -416,7 +472,7 @@ export default function AdminPage() {
                                 size="icon"
                                 className="h-8 w-8 text-destructive hover:text-destructive"
                                 title="Delete product"
-                                disabled={deletingProductId === product.id}
+                                disabled={product.isDemo || deletingProductId === product.id}
                                 onClick={() => handleDeleteProduct(product)}
                               >
                                 <Trash2 className="h-4 w-4" />

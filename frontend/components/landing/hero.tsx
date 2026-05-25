@@ -1,24 +1,26 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck, HardHat, Factory } from "lucide-react"
+import { ShieldCheck, HardHat, Factory, ClipboardCheck } from "lucide-react"
+import { QuoteLink } from "@/components/quote-link"
 
 export function Hero() {
   return (
-    <section id="home" className="relative bg-foreground overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+    <section id="home" className="relative overflow-hidden bg-foreground">
+      <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
           <div className="text-center lg:text-left">
+            <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-md border border-background/15 bg-background/10 px-3 py-2 text-sm font-medium text-background/85 lg:mx-0">
+              <ClipboardCheck className="h-4 w-4 text-primary" />
+              PPE supply for industrial teams
+            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-background leading-tight text-balance">
-              Industrial Safety Equipment You Can{" "}
-              <span className="text-primary">Trust</span>
+              Industrial Safety Equipment Built for Serious Worksites
             </h1>
             <p className="mt-6 text-lg text-background/70 max-w-xl mx-auto lg:mx-0 text-pretty">
               TRACMAC Marketing delivers premium personal protective equipment to construction, mining, and industrial sectors. Protect your workforce with certified safety gear from a supplier who understands your industry.
@@ -28,32 +30,34 @@ export function Hero() {
                 <Link href="/products">View Products</Link>
               </Button>
               <Button size="lg" variant="outline" className="bg-transparent border-background/30 text-background hover:bg-background/10 hover:text-background" asChild>
-                <Link href="/#contact">Get a Quote</Link>
+                <QuoteLink>Get a Quote</QuoteLink>
               </Button>
             </div>
-
+            <div className="mt-10 grid grid-cols-3 gap-3 text-left">
+              {["Fast quotes", "Brand options", "Compliance-ready"].map((item) => (
+                <div key={item} className="rounded-lg border border-background/10 bg-background/5 p-3">
+                  <p className="text-sm font-semibold text-background">{item}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Hero Visual */}
           <div className="relative hidden lg:block">
-            <div className="relative bg-background/5 rounded-2xl p-8 backdrop-blur-sm border border-background/10">
+            <div className="relative overflow-hidden rounded-xl border border-background/10 bg-background/5 p-8 shadow-2xl shadow-black/25 backdrop-blur-sm">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-background/10 rounded-xl p-6 flex flex-col items-center text-center">
+                <div className="rounded-lg bg-background/10 p-6 text-center">
                   <HardHat className="h-12 w-12 text-primary mb-3" />
                   <span className="text-background font-medium">Head Protection</span>
                 </div>
-                <div className="bg-background/10 rounded-xl p-6 flex flex-col items-center text-center">
+                <div className="rounded-lg bg-background/10 p-6 text-center">
                   <ShieldCheck className="h-12 w-12 text-primary mb-3" />
                   <span className="text-background font-medium">Body Protection</span>
                 </div>
-                <div className="bg-background/10 rounded-xl p-6 flex flex-col items-center text-center col-span-2">
-                  <Factory className="h-12 w-12 text-primary mb-3" />
-                  <span className="text-background font-medium">Complete Industrial Safety Solutions</span>
+                <div className="col-span-2 rounded-lg bg-primary p-6 text-center text-primary-foreground">
+                  <Factory className="h-12 w-12 text-primary-foreground mb-3" />
+                  <span className="font-semibold">Complete Industrial Safety Solutions</span>
                 </div>
               </div>
-              {/* Decorative Elements */}
-              <div className="absolute -top-4 -right-4 h-20 w-20 bg-primary/20 rounded-full blur-2xl" />
-              <div className="absolute -bottom-4 -left-4 h-16 w-16 bg-primary/30 rounded-full blur-xl" />
             </div>
           </div>
         </div>

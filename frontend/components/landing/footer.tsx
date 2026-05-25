@@ -1,14 +1,14 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react"
+import { Mail, MapPin, Phone } from "lucide-react"
 import tmacLogo from "@/assets/tmaclogo.png"
 
 const footerLinks = {
   products: [
-    { label: "Head Protection", href: "/products" },
-    { label: "Workwear", href: "/products" },
-    { label: "Hand Protection", href: "/products" },
-    { label: "Foot Protection", href: "/products" },
+    { label: "Head Protection", href: "/products?category=Head%20Protection" },
+    { label: "Workwear", href: "/products?category=Workwear" },
+    { label: "Hand Protection", href: "/products?category=Hand%20Protection" },
+    { label: "Foot Protection", href: "/products?category=Foot%20Protection" },
     { label: "Full Catalog", href: "/products" },
   ],
   industries: [
@@ -20,16 +20,19 @@ const footerLinks = {
   company: [
     { label: "About Us", href: "/#about" },
     { label: "Contact", href: "/#contact" },
-    { label: "Careers", href: "#" },
-    { label: "Blog", href: "#" },
+    { label: "Request Quote", href: "/#contact" },
+    { label: "Product Catalog", href: "/products" },
   ],
 }
 
-const socialLinks = [
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Instagram, href: "#", label: "Instagram" },
+const contactLinks = [
+  { icon: Phone, href: "tel:+639178913681", label: "Call TRACMAC" },
+  { icon: Mail, href: "mailto:info@coretech.com.ph", label: "Email TRACMAC" },
+  {
+    icon: MapPin,
+    href: "https://www.google.com/maps/search/?api=1&query=Mercedes+Plaza+I+Mercedes+Ave+Pasig+City",
+    label: "Find TRACMAC",
+  },
 ]
 
 export function Footer() {
@@ -40,27 +43,24 @@ export function Footer() {
         <div className="py-16 grid sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <div className="mb-6 flex items-center gap-4">
-              <Image
-                src={tmacLogo}
-                alt="TRACMAC Marketing logo"
-                className="h-24 w-24 rounded-2xl bg-white p-2 object-contain shadow-lg ring-1 ring-primary/30 lg:h-30 lg:w-30"
-              />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-background lg:text-2xl">TRACMAC</span>
-                <span className="text-xs uppercase tracking-[0.35em] text-background/60">Marketing</span>
+            <div className="mb-6">
+              <div className="inline-flex rounded-md bg-background px-5 py-4">
+                <Image
+                  src={tmacLogo}
+                  alt="TRACMAC Marketing logo"
+                  className="h-20 w-auto object-contain lg:h-24"
+                />
               </div>
             </div>
-            {/* Social Links */}
             <div className="flex gap-4">
-              {socialLinks.map((social) => (
+              {contactLinks.map((item) => (
                 <Link
-                  key={social.label}
-                  href={social.href}
+                  key={item.label}
+                  href={item.href}
                   className="h-10 w-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
-                  aria-label={social.label}
+                  aria-label={item.label}
                 >
-                  <social.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5" />
                 </Link>
               ))}
             </div>
@@ -114,12 +114,9 @@ export function Footer() {
           <p className="text-sm text-background/50">
             &copy; {new Date().getFullYear()} TRACMAC Marketing. All rights reserved.
           </p>
-          <div className="flex gap-6">
-            <Link href="#" className="text-sm text-background/50 hover:text-background/80 transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="text-sm text-background/50 hover:text-background/80 transition-colors">
-              Terms of Service
+          <div className="flex gap-6 text-sm text-background/50">
+            <Link href="/admin" className="hover:text-background/80 transition-colors">
+              Admin Login
             </Link>
           </div>
         </div>

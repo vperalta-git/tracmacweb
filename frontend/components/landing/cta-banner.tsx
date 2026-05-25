@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Phone } from "lucide-react"
+import { QuoteLink } from "@/components/quote-link"
 
 export function CTABanner() {
   return (
@@ -23,13 +24,13 @@ export function CTABanner() {
 
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
-              <Link href="/#contact" className="flex items-center gap-2">
+              <QuoteLink className="flex items-center gap-2">
                 Request a Quote Today
                 <ArrowRight className="h-5 w-5" />
-              </Link>
+              </QuoteLink>
             </Button>
             <Button size="lg" variant="outline" className="bg-transparent border-background/30 text-background hover:bg-background/10 hover:text-background" asChild>
-              <Link href="tel:+1234567890" className="flex items-center gap-2">
+              <Link href="tel:+639178913681" className="flex items-center gap-2">
                 <Phone className="h-5 w-5" />
                 Call Us Now
               </Link>

@@ -1,5 +1,6 @@
 import { Header } from "@/components/landing/header"
 import { Hero } from "@/components/landing/hero"
+import { ProductShowcase } from "@/components/landing/product-showcase"
 import { Industries } from "@/components/landing/industries"
 import { WhyChooseUs } from "@/components/landing/why-choose-us"
 import { About } from "@/components/landing/about"
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
+        <ProductShowcase />
         <Industries />
         <WhyChooseUs />
         <About />

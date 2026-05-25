@@ -1,12 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, Phone, Mail, Clock } from "lucide-react"
 import { sendContactMessage } from "@/lib/email"
+import {
+  createQuoteMessage,
+  QUOTE_CONTEXT_EVENT,
+  QUOTE_CONTEXT_STORAGE_KEY,
+  type QuoteContext,
+} from "@/lib/quote-context"
 
 const contactInfo = [
   {
@@ -25,7 +31,7 @@ const contactInfo = [
   {
     icon: Clock,
     title: "Business Hours",
-    details: ["Mon-Fri, 9am - 6pm PST"],
+    details: ["Mon-Fri, 9am - 6pm PHT"],
   },
   {
     icon: Mail,
@@ -35,6 +41,7 @@ const contactInfo = [
 ]
 
 export function Contact() {
+  const [inquiryContext, setInquiryContext] = useState("")
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -45,6 +52,57 @@ export function Contact() {
   const [isSending, setIsSending] = useState(false)
   const [statusMessage, setStatusMessage] = useState("")
 
+  function applyQuoteContext(context: QuoteContext) {
+    const label =
+      context.type === "product"
+        ? `Product inquiry: ${context.value}`
+        : context.type === "category"
+          ? `Category inquiry: ${context.value}`
+          : "General PPE inquiry"
+
+    setInquiryContext(label)
+    setFormData((current) => ({
+      ...current,
+      message: current.message || createQuoteMessage(context),
+    }))
+  }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const product = params.get("product")
+    const category = params.get("category")
+    const urlContext: QuoteContext | null = product
+      ? { type: "product", value: product }
+      : category
+        ? { type: "category", value: category }
+        : null
+
+    if (urlContext) {
+      applyQuoteContext(urlContext)
+      return
+    }
+
+    try {
+      const storedContext = window.localStorage.getItem(QUOTE_CONTEXT_STORAGE_KEY)
+
+      if (storedContext) {
+        applyQuoteContext(JSON.parse(storedContext) as QuoteContext)
+      }
+    } catch {
+      window.localStorage.removeItem(QUOTE_CONTEXT_STORAGE_KEY)
+    }
+
+    function handleQuoteContext(event: Event) {
+      const customEvent = event as CustomEvent<QuoteContext>
+
+      applyQuoteContext(customEvent.detail)
+    }
+
+    window.addEventListener(QUOTE_CONTEXT_EVENT, handleQuoteContext)
+
+    return () => window.removeEventListener(QUOTE_CONTEXT_EVENT, handleQuoteContext)
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -52,8 +110,14 @@ export function Contact() {
     setStatusMessage("")
 
     try {
-      await sendContactMessage(formData)
-      setStatusMessage("Your message was sent successfully. We will get back to you within 24 hours.")
+      const result = await sendContactMessage(formData)
+      const savedLocally = typeof result === "object" && result !== null && "local" in result
+
+      setStatusMessage(
+        savedLocally
+          ? "Demo inquiry saved locally. Add EmailJS keys later to send real emails."
+          : "Your message was sent successfully. We will get back to you within 24 hours.",
+      )
       setFormData({
         name: "",
         company: "",
@@ -118,6 +182,11 @@ export function Contact() {
             <Card className="border-border shadow-lg">
               <CardContent className="p-8">
                 <h3 className="text-xl font-semibold text-foreground mb-6">Send Us a Message</h3>
+                {inquiryContext && (
+                  <div className="mb-6 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-medium text-foreground">
+                    {inquiryContext}
+                  </div>
+                )}
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>

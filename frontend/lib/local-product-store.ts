@@ -57,12 +57,13 @@ function readTextValue(formData: FormData, key: string) {
 function readProductPayload(formData: FormData) {
   const name = readTextValue(formData, "name")
   const category = readTextValue(formData, "category")
+  const brand = readTextValue(formData, "brand")
   const description = readTextValue(formData, "description")
   const spec = readTextValue(formData, "spec")
   const badge = readTextValue(formData, "badge")
 
-  if (!name || !category || !description || !spec) {
-    throw new Error("Name, category, description, and specs are required.")
+  if (!name || !category || !brand || !description || !spec) {
+    throw new Error("Name, brand, category, description, and specs are required.")
   }
 
   if (!isValidCategory(category)) {
@@ -72,6 +73,7 @@ function readProductPayload(formData: FormData) {
   return {
     name,
     category,
+    brand,
     description,
     spec,
     badge: badge || undefined,
