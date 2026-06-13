@@ -3,8 +3,8 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'TRACMAC Marketing | Industrial PPE & Safety Equipment Supplier',
-  description: 'TRACMAC Marketing is a trusted supplier of personal protective equipment (PPE) for construction, mining, industrial, and manufacturing sectors. Quality safety gear for workplace protection.',
+  title: 'Strongbuilt | Trucks, Buses & Heavy Equipment',
+  description: 'Strongbuilt supplies commercial trucks, buses, trailers, and heavy equipment for fleet, logistics, construction, and industrial operations.',
   generator: 'v0.app',
   icons: {
     icon: [

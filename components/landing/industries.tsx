@@ -1,114 +1,123 @@
+import Link from "next/link"
 import Image, { type StaticImageData } from "next/image"
-import { Bolt, Building2, Factory, Pickaxe, Truck, type LucideIcon } from "lucide-react"
-import constructionImage from "@/assets/homedesign/industry-construction.png"
-import miningImage from "@/assets/homedesign/industry-mining.png"
-import manufacturingImage from "@/assets/homedesign/industry-manufacturing.png"
-import energyUtilitiesImage from "@/assets/homedesign/industry-energy-utilities.png"
-import logisticsTransportImage from "@/assets/homedesign/industry-logistics-transport.png"
+import { ArrowRight, Building2, Mountain, Recycle, Route, Tractor, Warehouse } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import heroImage from "@/assets/homedesign/strongbuilt-industry-hero-bg.png"
+import logisticsImage from "@/assets/homedesign/strongbuilt-logistics-delivery.png"
+import constructionImage from "@/assets/homedesign/strongbuilt-construction.png"
+import agricultureImage from "@/assets/homedesign/strongbuilt-agriculture.png"
+import miningImage from "@/assets/shacman/Sx3315GV406.png"
+import wasteImage from "@/assets/homedesign/strongbuilt-waste-management.png"
+import fleetImage from "@/assets/homedesign/strongbuilt-fleet-operations.png"
 
-type Industry = {
-  icon: LucideIcon
-  title: string
-  description: string
-  image: StaticImageData
-  accent: "orange" | "navy"
-}
-
-const industries: Industry[] = [
+const industries = [
+  {
+    icon: Warehouse,
+    title: "Logistics & Delivery",
+    image: logisticsImage,
+    description: "Efficient trucks for distribution, last-mile delivery, and supply chain operations.",
+  },
   {
     icon: Building2,
     title: "Construction",
-    description: "Site-ready PPE for civil, building, and road work crews.",
     image: constructionImage,
-    accent: "orange",
+    description: "Durable and heavy-duty trucks built for construction sites and demanding projects.",
   },
   {
-    icon: Pickaxe,
-    title: "Mining",
-    description: "Heavy-duty protection for surface and underground operations.",
+    icon: Tractor,
+    title: "Agriculture",
+    image: agricultureImage,
+    description: "Dependable trucks for farms, plantations, and agricultural transport needs.",
+  },
+  {
+    icon: Mountain,
+    title: "Mining & Quarry",
     image: miningImage,
-    accent: "navy",
+    description: "Built tough for heavy loads and harsh mining & quarry environments.",
   },
   {
-    icon: Factory,
-    title: "Manufacturing",
-    description: "Daily safety gear for production floors and assembly lines.",
-    image: manufacturingImage,
-    accent: "orange",
+    icon: Recycle,
+    title: "Waste Management",
+    image: wasteImage,
+    description: "Specialized trucks for waste collection, disposal, and environmental services.",
   },
   {
-    icon: Bolt,
-    title: "Energy & Utilities",
-    description: "Certified equipment for electrical, field, and service teams.",
-    image: energyUtilitiesImage,
-    accent: "navy",
+    icon: Route,
+    title: "Fleet Operations",
+    image: fleetImage,
+    description: "Scalable fleet solutions to keep your business moving and your operations ahead.",
   },
-  {
-    icon: Truck,
-    title: "Logistics & Transport",
-    description: "Visibility and handling protection for fast-moving operations.",
-    image: logisticsTransportImage,
-    accent: "orange",
-  },
-]
+] satisfies {
+  icon: typeof Warehouse
+  title: string
+  image: StaticImageData
+  description: string
+}[]
 
 export function Industries() {
   return (
-    <section id="industries" className="relative overflow-hidden bg-[#fbfaf7] py-16 lg:py-24">
-      <div
-        className="pointer-events-none absolute right-0 top-8 h-72 w-72 opacity-[0.1]"
-        style={{
-          backgroundImage: "radial-gradient(circle, #f97316 2px, transparent 2px)",
-          backgroundSize: "18px 18px",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute bottom-8 left-0 h-64 w-64 opacity-[0.08]"
-        style={{
-          backgroundImage: "radial-gradient(circle, #f97316 2px, transparent 2px)",
-          backgroundSize: "18px 18px",
-        }}
-      />
-
-      <div className="mx-auto max-w-[1520px] px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-12 max-w-5xl text-center lg:mb-16">
-          <span className="text-sm font-extrabold uppercase tracking-[0.08em] text-primary">
-            Built for Industry. Backed by Trust.
-          </span>
-          <div className="mx-auto mt-5 h-0.5 w-20 rounded-full bg-primary" />
-          <h2 className="mt-7 text-4xl font-extrabold leading-tight tracking-tight text-[#0b2038] text-balance sm:text-5xl lg:text-6xl">
-            Safety Solutions for Every Worksite
+    <section id="industries" className="overflow-hidden bg-[#faf7f2]">
+      <div className="relative bg-[#101010] py-20 text-white lg:py-24">
+        <Image src={heroImage} alt="" fill priority={false} className="object-cover opacity-45" sizes="100vw" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,16,0.94)_0%,rgba(16,16,16,0.78)_42%,rgba(16,16,16,0.48)_100%)]" />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "linear-gradient(135deg, transparent 0 46%, white 46% 49%, transparent 49% 100%)",
+            backgroundSize: "42px 42px",
+          }}
+        />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Badge className="bg-primary text-primary-foreground">Our Industries</Badge>
+          <h2 className="mt-5 max-w-2xl text-4xl font-bold leading-tight text-balance sm:text-5xl">
+            Solutions for Every <span className="text-primary">Business Route</span>
           </h2>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/78 text-pretty">
+            Strongbuilt provides reliable commercial trucks and equipment built to support the industries that keep our
+            nation moving.
+          </p>
         </div>
+      </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="relative py-16 lg:py-20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: "linear-gradient(135deg, transparent 0 46%, #161616 46% 49%, transparent 49% 100%)",
+            backgroundSize: "44px 44px",
+          }}
+        />
+        <div className="relative mx-auto grid max-w-7xl gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
           {industries.map((industry) => (
             <article
               key={industry.title}
-              className="group relative flex min-h-[430px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-900/8 transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-slate-900/14"
+              className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#d8d8d8] bg-white shadow-sm shadow-black/5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:shadow-xl hover:shadow-black/10"
             >
-              <div className="absolute inset-x-0 top-0 z-20 h-1 bg-primary transition-all duration-300 group-hover:h-1.5" />
-              <div className="flex w-full flex-col">
-                <div className="relative h-52 overflow-hidden">
-                  <Image
-                    src={industry.image}
-                    alt={industry.title}
-                    fill
-                    sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/82 to-transparent" />
+              <div className="h-1 bg-primary/85 transition-all duration-300 group-hover:bg-primary" />
+              <div className="relative h-56 overflow-hidden bg-[linear-gradient(135deg,#ece9e4_0%,#ffffff_45%,#f7efe8_100%)] sm:h-52 lg:h-56">
+                <Image
+                  src={industry.image}
+                  alt={industry.title}
+                  className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/35 to-transparent" />
+                <div className="absolute left-5 top-5 flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shadow-black/20">
+                  <industry.icon className="h-6 w-6" />
                 </div>
-
-                <div className="relative flex flex-1 flex-col p-7 pt-0">
-                  <div className="-mt-10 mb-6 flex h-20 w-20 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-900/10">
-                    <industry.icon
-                      className={`h-10 w-10 ${industry.accent === "orange" ? "text-primary" : "text-[#123b72]"}`}
-                    />
-                  </div>
-                  <h3 className="text-2xl font-extrabold leading-tight text-[#0b2038]">{industry.title}</h3>
-                  <p className="mt-5 text-base leading-8 text-slate-600">{industry.description}</p>
-                </div>
+              </div>
+              <div className="relative flex flex-1 flex-col p-6">
+                <h3 className="text-xl font-bold leading-snug text-foreground">{industry.title}</h3>
+                <p className="mt-3 flex-1 leading-7 text-muted-foreground">{industry.description}</p>
+                <Link
+                  href="/products"
+                  className="mt-5 inline-flex items-center justify-between gap-2 text-sm font-semibold text-primary transition-colors hover:text-[#c94d00]"
+                >
+                  <span>View solutions</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </article>
           ))}

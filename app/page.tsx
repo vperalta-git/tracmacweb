@@ -4,10 +4,11 @@ import { ProductShowcase } from "@/components/landing/product-showcase"
 import { Industries } from "@/components/landing/industries"
 import { WhyChooseUs } from "@/components/landing/why-choose-us"
 import { About } from "@/components/landing/about"
-import { TrustedBrands } from "@/components/landing/trusted-brands"
+import BrandMarquee from "@/components/landing/brand-marquee"
 import { CTABanner } from "@/components/landing/cta-banner"
 import { Contact } from "@/components/landing/contact"
 import { Footer } from "@/components/landing/footer"
+import { productBrands } from "@/lib/brand-data"
 
 export default function HomePage() {
   return (
@@ -15,11 +16,11 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
-        <TrustedBrands />
         <ProductShowcase />
         <Industries />
         <WhyChooseUs />
         <About />
+        <BrandMarquee brands={productBrands.filter((brand) => brand.name !== "Strongbuilt").slice(-10)} />
         <CTABanner />
         <Contact />
       </main>

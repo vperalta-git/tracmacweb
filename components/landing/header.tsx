@@ -4,26 +4,25 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { ChevronDown, Menu, Search, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Menu, X } from "lucide-react"
 import { QuoteLink } from "@/components/quote-link"
-import { getSiteConfigForPath, siteHref } from "@/lib/site-config"
+import { SectionLink } from "@/components/section-link"
+import { Button } from "@/components/ui/button"
+import darkLogo from "@/assets/darklogo.png"
+import { cn } from "@/lib/utils"
 
 const navLinks = [
   { href: "/#home", label: "Home" },
-  { href: "/products", label: "Products", hasMenu: true },
-  { href: "/#industries", label: "Industries", hasMenu: true },
+  { href: "/products", label: "Products" },
+  { href: "/#industries", label: "Industries" },
   { href: "/#about", label: "About" },
   { href: "/#contact", label: "Contact" },
 ]
 
 export function Header() {
   const pathname = usePathname()
-  const site = getSiteConfigForPath(pathname)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeHash, setActiveHash] = useState("")
-  const links = navLinks.map((link) => ({ ...link, href: siteHref(site, link.href) }))
 
   useEffect(() => {
     const updateHash = () => setActiveHash(window.location.hash)
@@ -36,73 +35,57 @@ export function Header() {
 
   function isActiveLink(href: string) {
     const [linkPath, linkHash] = href.split("#")
-    const currentPath = pathname === site.basePath ? "/" : pathname.replace(site.basePath, "") || "/"
-    const normalizedLinkPath = linkPath === site.basePath ? "/" : linkPath.replace(site.basePath, "") || "/"
 
-    if (currentPath === "/products") {
-      return normalizedLinkPath === "/products"
+    if (pathname === "/products") {
+      return href === "/products"
     }
 
-    if (currentPath !== (normalizedLinkPath || "/")) {
+    if (pathname !== (linkPath || "/")) {
       return false
     }
 
     if (!linkHash) {
-      return currentPath === normalizedLinkPath
+      return pathname === href
     }
 
     return activeHash ? activeHash === `#${linkHash}` : linkHash === "home"
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#071d34]/95 text-white shadow-sm shadow-black/10 backdrop-blur-xl">
-      <div className="mx-auto max-w-[1520px] px-4 sm:px-6 lg:px-8">
-        <div className="flex min-h-20 items-center justify-between py-2">
-          <Link href={siteHref(site, "/")} className="flex items-center">
-            {site.logo ? (
-              <Image
-                src={site.logo}
-                alt={site.logoAlt}
-                className="h-16 w-auto object-contain lg:h-18"
-                priority
-              />
-            ) : (
-              <span className="text-2xl font-extrabold uppercase tracking-[0.12em] text-white">{site.shortName}</span>
-            )}
+    <header className="sticky top-0 z-50 border-b border-border bg-card/95 shadow-sm backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex min-h-20 items-center justify-between py-3 lg:min-h-24">
+          <Link href="/" className="flex items-center">
+            <Image
+              src={darkLogo}
+              alt="Strongbuilt logo"
+              className="h-16 w-auto object-contain lg:h-20"
+              priority
+            />
           </Link>
 
-          <nav className="hidden h-20 items-center gap-10 lg:flex">
-            {links.map((link) => (
-              <Link
+          <nav className="hidden lg:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <SectionLink
                 key={link.href}
                 href={link.href}
                 aria-current={isActiveLink(link.href) ? "page" : undefined}
                 className={cn(
-                  "relative flex h-full items-center gap-1.5 px-1 text-sm font-semibold text-white/72 transition-colors hover:text-white",
-                  isActiveLink(link.href) &&
-                    "text-white after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-primary",
+                  "rounded-md px-3 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-primary/10 hover:text-primary",
+                  isActiveLink(link.href) && "bg-primary/15 text-primary",
                 )}
               >
                 {link.label}
-                {link.hasMenu && <ChevronDown className="h-3.5 w-3.5" />}
-              </Link>
+              </SectionLink>
             ))}
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden items-center gap-3 lg:flex">
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-11 border-white/35 bg-transparent px-5 text-white hover:bg-white/10 hover:text-white"
-              asChild
-            >
-              <Link href={siteHref(site, "/products")}>
-                <Search className="h-4 w-4" />
-                Browse Products
-              </Link>
+          <div className="hidden lg:flex items-center gap-4">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/products">Browse Trucks</Link>
             </Button>
-            <Button size="lg" className="h-11 px-6 shadow-lg shadow-orange-950/30" asChild>
+            <Button size="sm" asChild>
               <QuoteLink>Request a Quote</QuoteLink>
             </Button>
           </div>
@@ -110,7 +93,7 @@ export function Header() {
           {/* Mobile Menu Button */}
           <button
             type="button"
-            className="rounded-md p-2 text-white transition hover:bg-white/10 lg:hidden"
+            className="lg:hidden p-2 text-foreground"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -120,28 +103,25 @@ export function Header() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="border-t border-white/10 py-4 lg:hidden">
-            <nav className="flex flex-col gap-2">
-              {links.map((link) => (
-                <Link
+          <div className="lg:hidden border-t border-border py-4">
+            <nav className="flex flex-col gap-4">
+              {navLinks.map((link) => (
+                <SectionLink
                   key={link.href}
                   href={link.href}
                   aria-current={isActiveLink(link.href) ? "page" : undefined}
                   className={cn(
-                    "rounded-md px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white",
-                    isActiveLink(link.href) && "bg-white/10 text-white",
+                    "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-primary/10 hover:text-primary",
+                    isActiveLink(link.href) && "bg-primary/15 text-primary",
                   )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}
-                </Link>
+                </SectionLink>
               ))}
-              <div className="mt-2 flex flex-col gap-2 border-t border-white/10 pt-4">
-                <Button variant="outline" size="sm" className="border-white/35 bg-transparent text-white hover:bg-white/10 hover:text-white" asChild>
-                  <Link href={siteHref(site, "/products")}>
-                    <Search className="h-4 w-4" />
-                    Browse Products
-                  </Link>
+              <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/products">Browse Trucks</Link>
                 </Button>
                 <Button size="sm" asChild>
                   <QuoteLink onClick={() => setMobileMenuOpen(false)}>Request a Quote</QuoteLink>

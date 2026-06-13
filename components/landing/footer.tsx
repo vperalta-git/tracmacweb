@@ -1,76 +1,62 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
 import { Mail, MapPin, Phone } from "lucide-react"
-import { getSiteConfigForPath, siteHref } from "@/lib/site-config"
+import whiteLogo from "@/assets/whitelogo.png"
 
 const footerLinks = {
   products: [
-    { label: "Head Protection", href: "/products?category=Head%20Protection" },
-    { label: "Workwear", href: "/products?category=Workwear" },
-    { label: "Hand Protection", href: "/products?category=Hand%20Protection" },
-    { label: "Foot Protection", href: "/products?category=Foot%20Protection" },
-    { label: "Full Catalog", href: "/products" },
+    { label: "Light-Duty Trucks", href: "/products" },
+    { label: "Medium-Duty Trucks", href: "/products" },
+    { label: "Aluminum Van", href: "/products" },
+    { label: "Dump Truck", href: "/products" },
+    { label: "Full Inventory", href: "/products" },
   ],
   industries: [
+    { label: "Logistics", href: "/#industries" },
     { label: "Construction", href: "/#industries" },
-    { label: "Mining", href: "/#industries" },
-    { label: "Manufacturing", href: "/#industries" },
-    { label: "Warehousing", href: "/#industries" },
+    { label: "Cold Chain", href: "/#industries" },
+    { label: "Fleet Operations", href: "/#industries" },
   ],
   company: [
     { label: "About Us", href: "/#about" },
     { label: "Contact", href: "/#contact" },
     { label: "Request Quote", href: "/#contact" },
-    { label: "Product Catalog", href: "/products" },
+    { label: "Truck Inventory", href: "/products" },
   ],
 }
 
 const contactLinks = [
-  { icon: Phone, href: "tel:+639178913681", label: "Call TRACMAC" },
-  { icon: Mail, href: "mailto:info@coretech.com.ph", label: "Email TRACMAC" },
+  { icon: Phone, href: "tel:+639178913681", label: "Call Strongbuilt" },
+  { icon: Mail, href: "mailto:sales@strongbuilt.com.ph", label: "Email Strongbuilt" },
   {
     icon: MapPin,
     href: "https://www.google.com/maps/search/?api=1&query=Mercedes+Plaza+I+Mercedes+Ave+Pasig+City",
-    label: "Find TRACMAC",
+    label: "Find Strongbuilt",
   },
 ]
 
 export function Footer() {
-  const site = getSiteConfigForPath(usePathname())
-
   return (
-    <footer className="bg-[#243140] text-white">
-      <div className="section-shell">
-        <div className="grid gap-8 py-14 sm:grid-cols-2 lg:grid-cols-5 lg:gap-12">
+    <footer className="bg-foreground text-background">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Main Footer */}
+        <div className="py-16 grid sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+          {/* Brand Column */}
           <div className="lg:col-span-2">
             <div className="mb-6">
-              <div className="inline-flex px-0 py-0">
-                {site.logo ? (
-                  <Image
-                    src={site.logo}
-                    alt={site.logoAlt}
-                    className="h-16 w-auto object-contain lg:h-18"
-                  />
-                ) : (
-                  <span className="text-2xl font-extrabold uppercase tracking-[0.12em] text-white">
-                    {site.shortName}
-                  </span>
-                )}
-              </div>
+              <Image
+                src={whiteLogo}
+                alt="Strongbuilt logo"
+                className="h-20 w-auto object-contain lg:h-24"
+              />
             </div>
-            <p className="max-w-sm text-sm leading-7 text-white/62">
-              Industrial PPE, safety supplies, and procurement support for teams that need reliable protection.
-            </p>
-            <div className="mt-6 flex gap-3">
+            <div className="flex gap-4">
               {contactLinks.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex h-10 w-10 items-center justify-center rounded-md bg-white/10 transition-colors hover:bg-primary hover:text-primary-foreground"
-                  aria-label={item.label.replace("TRACMAC", site.contactLabel)}
+                  className="h-10 w-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+                  aria-label={item.label}
                 >
                   <item.icon className="h-5 w-5" />
                 </Link>
@@ -78,12 +64,13 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Inventory */}
           <div>
-            <h3 className="mb-4 font-semibold text-white">Products</h3>
+            <h3 className="font-semibold text-background mb-4">Inventory</h3>
             <ul className="space-y-3">
               {footerLinks.products.map((link) => (
                 <li key={link.label}>
-                  <Link href={siteHref(site, link.href)} className="text-sm text-white/62 transition-colors hover:text-primary">
+                  <Link href={link.href} className="text-background/70 hover:text-primary transition-colors text-sm">
                     {link.label}
                   </Link>
                 </li>
@@ -91,12 +78,13 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Industries */}
           <div>
-            <h3 className="mb-4 font-semibold text-white">Industries</h3>
+            <h3 className="font-semibold text-background mb-4">Industries</h3>
             <ul className="space-y-3">
               {footerLinks.industries.map((link) => (
                 <li key={link.label}>
-                  <Link href={siteHref(site, link.href)} className="text-sm text-white/62 transition-colors hover:text-primary">
+                  <Link href={link.href} className="text-background/70 hover:text-primary transition-colors text-sm">
                     {link.label}
                   </Link>
                 </li>
@@ -104,12 +92,13 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Company */}
           <div>
-            <h3 className="mb-4 font-semibold text-white">Company</h3>
+            <h3 className="font-semibold text-background mb-4">Company</h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <Link href={siteHref(site, link.href)} className="text-sm text-white/62 transition-colors hover:text-primary">
+                  <Link href={link.href} className="text-background/70 hover:text-primary transition-colors text-sm">
                     {link.label}
                   </Link>
                 </li>
@@ -118,12 +107,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 sm:flex-row">
-          <p className="text-sm text-white/50">
-            &copy; {new Date().getFullYear()} {site.name}. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="py-6 border-t border-background/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-background/50">
+            &copy; {new Date().getFullYear()} Strongbuilt Trucks. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm text-white/50">
-            <Link href="/admin" className="transition-colors hover:text-white">
+          <div className="flex gap-6 text-sm text-background/50">
+            <Link href="/admin" className="hover:text-background/80 transition-colors">
               Admin Login
             </Link>
           </div>

@@ -69,8 +69,8 @@ function normalizeProduct(product: Partial<CatalogProduct> | null): CatalogProdu
     id: product.id,
     name: product.name,
     category: product.category,
-    site: site && isValidSite(site) ? site : "tracmac",
-    brand: getBrandByName(cleanBrand(product.brand ?? ""))?.name ?? "TRACMAC",
+    site: site && isValidSite(site) ? site : "strongbuilt",
+    brand: getBrandByName(cleanBrand(product.brand ?? ""))?.name ?? "Strongbuilt",
     description: product.description,
     spec,
     badge: product.badge || undefined,
@@ -95,6 +95,10 @@ async function productsCollection() {
 export async function getProducts(options: { site?: ProductSiteSlug } = {}) {
   try {
     const collection = await productsCollection()
+    const fallbackDemoProducts = demoProducts.map((product) => ({
+      ...product,
+      site: product.site ?? "strongbuilt",
+    }))
     const storedProducts = (await collection.find({}).sort({ createdAt: -1 }).toArray())
       .map((item) => normalizeProduct(item as Partial<CatalogProduct>))
       .filter((item): item is CatalogProduct => Boolean(item))
@@ -103,11 +107,11 @@ export async function getProducts(options: { site?: ProductSiteSlug } = {}) {
 
     return [
       ...storedProducts,
-      ...demoProducts.filter((product) => !storedIds.has(product.id) && (!options.site || product.site === options.site)),
+      ...fallbackDemoProducts.filter((product) => !storedIds.has(product.id) && (!options.site || product.site === options.site)),
     ]
   } catch (error) {
     if (error instanceof Error && error.message.includes("MONGODB_URI")) {
-      return demoProducts
+      return demoProducts.map((product) => ({ ...product, site: product.site ?? "strongbuilt" }))
     }
 
     throw error
@@ -117,7 +121,7 @@ export async function getProducts(options: { site?: ProductSiteSlug } = {}) {
 function readProductPayload(formData: FormData) {
   const name = cleanText(formData.get("name"))
   const category = cleanText(formData.get("category"))
-  const site = cleanText(formData.get("site")) || "tracmac"
+  const site = cleanText(formData.get("site")) || "strongbuilt"
   const brand = cleanBrand(cleanText(formData.get("brand")))
   const description = cleanText(formData.get("description"))
   const spec = cleanText(formData.get("spec")) || cleanText(formData.get("specs"))
@@ -132,7 +136,7 @@ function readProductPayload(formData: FormData) {
   }
 
   if (!isValidSite(site)) {
-    throw new Error("Please choose Tracmac or Strongbuilt for this product.")
+    throw new Error("Please choose a valid website for this product.")
   }
 
   if (!isValidBrand(brand)) {

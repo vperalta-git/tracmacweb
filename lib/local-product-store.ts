@@ -66,7 +66,7 @@ function readTextValue(formData: FormData, key: string) {
 function readProductPayload(formData: FormData) {
   const name = readTextValue(formData, "name")
   const category = readTextValue(formData, "category")
-  const site = readTextValue(formData, "site") || "tracmac"
+  const site = readTextValue(formData, "site") || "strongbuilt"
   const brand = readTextValue(formData, "brand")
   const description = readTextValue(formData, "description")
   const spec = readTextValue(formData, "spec")
@@ -81,7 +81,7 @@ function readProductPayload(formData: FormData) {
   }
 
   if (!isValidSite(site)) {
-    throw new Error("Please choose Tracmac or Strongbuilt for this product.")
+    throw new Error("Please choose a valid website for this product.")
   }
 
   return {
