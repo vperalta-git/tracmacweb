@@ -1049,7 +1049,7 @@ export default function AdminPage() {
                             <CardContent className="grid gap-4 p-5 md:grid-cols-2">
                               {[
                                 ["Storage", "Products are saved in MongoDB and served to the public catalog API."],
-                                ["Image Uploads", "JPG, PNG, WEBP, and GIF product images up to 5MB are supported."],
+                                ["Image Uploads", "JPG, PNG, WEBP, and GIF product images up to 5MB are supported. Hosted uploads are saved with the MongoDB product record."],
                                 ["Session", "Admin sessions use the existing signed cookie authentication flow."],
                                 ["Publishing", "Saved products are available immediately on the public Products page."],
                               ].map(([label, value]) => (

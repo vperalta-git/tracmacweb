@@ -141,15 +141,18 @@ async function saveProductImage(file: File) {
     throw new Error("Product images must be 5MB or smaller.")
   }
 
-  await mkdir(UPLOAD_DIR, { recursive: true })
-
   const filename = `${Date.now()}-${crypto.randomUUID()}.${extension}`
   const filepath = path.join(UPLOAD_DIR, filename)
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  await writeFile(filepath, buffer)
+  try {
+    await mkdir(UPLOAD_DIR, { recursive: true })
+    await writeFile(filepath, buffer)
 
-  return `/uploads/products/${filename}`
+    return `/uploads/products/${filename}`
+  } catch {
+    return `data:${file.type};base64,${buffer.toString("base64")}`
+  }
 }
 
 async function deleteUploadedImage(imageUrl?: string) {
