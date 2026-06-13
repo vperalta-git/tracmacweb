@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { ZodError } from "zod"
+import { getApiErrorMessage } from "@/lib/api-errors"
 import { addContactInquiry } from "@/lib/contact-inquiry-store"
 
 export async function POST(request: Request) {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Unable to save your inquiry right now." },
+      { message: getApiErrorMessage(error, "Unable to save your inquiry right now.") },
       { status: 500 },
     )
   }

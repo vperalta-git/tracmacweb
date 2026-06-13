@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { getApiErrorMessage } from "@/lib/api-errors"
 import { getMongoDb } from "@/lib/mongodb"
 
 export async function GET() {
@@ -15,7 +16,7 @@ export async function GET() {
       {
         ok: false,
         database: "disconnected",
-        message: error instanceof Error ? error.message : "Database health check failed.",
+        message: getApiErrorMessage(error, "Database health check failed."),
         timestamp: new Date().toISOString(),
       },
       { status: 503 },

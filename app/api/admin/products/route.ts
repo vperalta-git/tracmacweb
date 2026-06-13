@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { getApiErrorMessage } from "@/lib/api-errors"
 import { addProduct, deleteProduct, getProducts, updateProduct } from "@/lib/server-product-store"
 import { ADMIN_COOKIE_NAME, isValidAdminToken } from "@/lib/admin-session"
 
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ product })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Unable to save product." },
+      { message: getApiErrorMessage(error, "Unable to save product.") },
       { status: 400 },
     )
   }
@@ -57,7 +58,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ product })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Unable to update product." },
+      { message: getApiErrorMessage(error, "Unable to update product.") },
       { status: 400 },
     )
   }
@@ -76,7 +77,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ ok: true })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Unable to delete product." },
+      { message: getApiErrorMessage(error, "Unable to delete product.") },
       { status: 400 },
     )
   }
