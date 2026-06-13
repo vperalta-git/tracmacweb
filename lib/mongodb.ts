@@ -9,7 +9,7 @@ type MongoGlobal = typeof globalThis & {
 
 function getMongoClientPromise() {
   if (!uri) {
-    throw new Error("MONGODB_URI is required. Add it to your environment variables.")
+    throw new Error("MONGODB_URI is required. Add it to .env.local for local development and to your hosting environment variables for deployment.")
   }
 
   const globalWithMongo = globalThis as MongoGlobal

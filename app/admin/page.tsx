@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import type { FormEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import Cropper, { type Area } from "react-easy-crop"
 import {
   Bell,
   Boxes,
@@ -69,6 +70,32 @@ type ContactInquiry = {
   createdAt: string
 }
 
+async function createCroppedImageFile(imageSrc: string, crop: Area, type: string, name: string) {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const element = new globalThis.Image()
+
+    element.onload = () => resolve(element)
+    element.onerror = () => reject(new Error("Unable to prepare the cropped image."))
+    element.src = imageSrc
+  })
+  const canvas = document.createElement("canvas")
+  const context = canvas.getContext("2d")
+
+  if (!context) {
+    throw new Error("Image cropping is not supported in this browser.")
+  }
+
+  canvas.width = crop.width
+  canvas.height = crop.height
+  context.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height)
+
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((value) => (value ? resolve(value) : reject(new Error("Unable to crop the selected image."))), type, 0.92)
+  })
+
+  return new File([blob], name, { type })
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isCheckingSession, setIsCheckingSession] = useState(true)
@@ -78,6 +105,11 @@ export default function AdminPage() {
   const [products, setProducts] = useState<CatalogProduct[]>([])
   const [editingProduct, setEditingProduct] = useState<CatalogProduct | null>(null)
   const [previewUrl, setPreviewUrl] = useState("")
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  const [imageCrop, setImageCrop] = useState({ x: 0, y: 0 })
+  const [imageZoom, setImageZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [imageInputKey, setImageInputKey] = useState(0)
   const [showPassword, setShowPassword] = useState(false)
   const [productSearchQuery, setProductSearchQuery] = useState("")
   const [inquiries, setInquiries] = useState<ContactInquiry[]>([])
@@ -224,12 +256,22 @@ export default function AdminPage() {
   function handleEditProduct(product: CatalogProduct) {
     setEditingProduct(product)
     setPreviewUrl(product.imageUrl ?? "")
+    setSelectedImageFile(null)
+    setCroppedAreaPixels(null)
+    setImageCrop({ x: 0, y: 0 })
+    setImageZoom(1)
+    setImageInputKey((current) => current + 1)
     setMessage("")
   }
 
   function handleCancelEdit() {
     setEditingProduct(null)
     setPreviewUrl("")
+    setSelectedImageFile(null)
+    setCroppedAreaPixels(null)
+    setImageCrop({ x: 0, y: 0 })
+    setImageZoom(1)
+    setImageInputKey((current) => current + 1)
     setMessage("")
     setFormResetKey((current) => current + 1)
   }
@@ -246,40 +288,62 @@ export default function AdminPage() {
     const form = event.currentTarget
     const formData = new FormData(form)
 
-    if (editingProduct) {
-      formData.set("id", editingProduct.id)
-    }
+    try {
+      if (editingProduct) {
+        formData.set("id", editingProduct.id)
+      }
 
-    const response = await fetch("/api/admin/products", {
-      method: editingProduct ? "PATCH" : "POST",
-      body: formData,
-    })
+      if (selectedImageFile && previewUrl && croppedAreaPixels) {
+        const croppedImage = await createCroppedImageFile(
+          previewUrl,
+          croppedAreaPixels,
+          selectedImageFile.type,
+          selectedImageFile.name,
+        )
 
-    setIsSaving(false)
+        formData.set("image", croppedImage)
+      }
 
-    const data = (await response.json()) as {
-      message?: string
-      product?: CatalogProduct
-    }
+      const response = await fetch("/api/admin/products", {
+        method: editingProduct ? "PATCH" : "POST",
+        body: formData,
+      })
 
-    if (!response.ok) {
-      setMessage(data.message ?? "Unable to save product.")
+      setIsSaving(false)
+
+      const data = (await response.json()) as {
+        message?: string
+        product?: CatalogProduct
+      }
+
+      if (!response.ok) {
+        setMessage(data.message ?? "Unable to save product.")
+        return
+      }
+
+      const savedProduct = data.product
+
+      if (savedProduct) {
+        setProducts((currentProducts: CatalogProduct[]) =>
+          editingProduct
+            ? currentProducts.map((product: CatalogProduct) => (product.id === savedProduct.id ? savedProduct : product))
+            : [savedProduct, ...currentProducts],
+        )
+      }
+    } catch (error) {
+      setIsSaving(false)
+      setMessage(error instanceof Error ? error.message : "Unable to save product.")
       return
-    }
-
-    const savedProduct = data.product
-
-    if (savedProduct) {
-      setProducts((currentProducts: CatalogProduct[]) =>
-        editingProduct
-          ? currentProducts.map((product: CatalogProduct) => (product.id === savedProduct.id ? savedProduct : product))
-          : [savedProduct, ...currentProducts],
-      )
     }
 
     form.reset()
     setEditingProduct(null)
     setPreviewUrl("")
+    setSelectedImageFile(null)
+    setCroppedAreaPixels(null)
+    setImageCrop({ x: 0, y: 0 })
+    setImageZoom(1)
+    setImageInputKey((current) => current + 1)
     setFormResetKey((current) => current + 1)
     setMessage(editingProduct ? "Product updated." : "Product saved and published to the catalog.")
   }
@@ -314,6 +378,11 @@ export default function AdminPage() {
     if (editingProduct?.id === product.id) {
       setEditingProduct(null)
       setPreviewUrl("")
+      setSelectedImageFile(null)
+      setCroppedAreaPixels(null)
+      setImageCrop({ x: 0, y: 0 })
+      setImageZoom(1)
+      setImageInputKey((current) => current + 1)
     }
 
     setMessage("Product deleted.")
@@ -700,35 +769,73 @@ export default function AdminPage() {
                         <Label htmlFor="image" className="text-xs font-extrabold text-[#0f2435]">
                           Product Image <span className="text-primary">*</span>
                         </Label>
-                        <label
-                          htmlFor="image"
-                          className="flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-[#b9c7d6] bg-[#eef3f7]/70 p-6 text-center transition hover:border-primary/50 hover:bg-orange-50"
-                        >
-                          {previewUrl ? (
-                            <div className="relative">
-                              <Image
-                                src={previewUrl}
-                                alt="Selected product preview"
-                                width={224}
-                                height={224}
-                                unoptimized
-                                className="max-h-56 rounded-md object-contain"
+                        {previewUrl && selectedImageFile ? (
+                          <div className="rounded-lg border border-[#d6dee8] bg-white p-4">
+                            <div className="relative h-72 overflow-hidden rounded-md bg-[#0f2435]">
+                              <Cropper
+                                image={previewUrl}
+                                crop={imageCrop}
+                                zoom={imageZoom}
+                                aspect={1}
+                                onCropChange={setImageCrop}
+                                onZoomChange={setImageZoom}
+                                onCropComplete={(_, areaPixels) => setCroppedAreaPixels(areaPixels)}
+                                showGrid={false}
                               />
-                              <span className="mt-3 block text-xs font-medium text-muted-foreground">
-                                Click to choose a different image
-                              </span>
                             </div>
-                          ) : (
-                            <>
-                              <ImagePlus className="h-10 w-10 text-[#6d7f91]" />
-                              <span className="mt-3 text-sm font-extrabold text-[#0b2038]">Drag & drop images here</span>
-                              <span className="mt-1 text-xs text-[#53677a]">
-                                or click to browse JPG, PNG, WEBP up to 5MB each
-                              </span>
-                            </>
-                          )}
-                        </label>
+                            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                              <label className="flex min-w-0 flex-1 items-center gap-3 text-sm font-semibold text-[#0f2435]">
+                                <span className="shrink-0">Zoom</span>
+                                <input
+                                  type="range"
+                                  min="1"
+                                  max="3"
+                                  step="0.05"
+                                  value={imageZoom}
+                                  onChange={(event) => setImageZoom(Number(event.target.value))}
+                                  className="w-full accent-orange-600"
+                                />
+                              </label>
+                              <label
+                                htmlFor="image"
+                                className="inline-flex h-9 cursor-pointer items-center justify-center rounded-md border border-[#d6dee8] px-3 text-sm font-bold text-[#0f2435] transition hover:bg-orange-50 hover:text-primary"
+                              >
+                                Choose Different
+                              </label>
+                            </div>
+                          </div>
+                        ) : (
+                          <label
+                            htmlFor="image"
+                            className="flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-[#b9c7d6] bg-[#eef3f7]/70 p-6 text-center transition hover:border-primary/50 hover:bg-orange-50"
+                          >
+                            {previewUrl ? (
+                              <div className="relative">
+                                <Image
+                                  src={previewUrl}
+                                  alt="Selected product preview"
+                                  width={224}
+                                  height={224}
+                                  unoptimized
+                                  className="max-h-56 rounded-md object-contain"
+                                />
+                                <span className="mt-3 block text-xs font-medium text-muted-foreground">
+                                  Click to choose a different image
+                                </span>
+                              </div>
+                            ) : (
+                              <>
+                                <ImagePlus className="h-10 w-10 text-[#6d7f91]" />
+                                <span className="mt-3 text-sm font-extrabold text-[#0b2038]">Drag & drop images here</span>
+                                <span className="mt-1 text-xs text-[#53677a]">
+                                  or click to browse JPG, PNG, WEBP up to 5MB each
+                                </span>
+                              </>
+                            )}
+                          </label>
+                        )}
                         <Input
+                          key={imageInputKey}
                           id="image"
                           name="image"
                           type="file"
@@ -736,7 +843,11 @@ export default function AdminPage() {
                           className="sr-only"
                           onChange={(event) => {
                             const file = event.target.files?.[0]
+                            setSelectedImageFile(file ?? null)
                             setPreviewUrl(file ? URL.createObjectURL(file) : "")
+                            setCroppedAreaPixels(null)
+                            setImageCrop({ x: 0, y: 0 })
+                            setImageZoom(1)
                           }}
                         />
                         {previewUrl && (
@@ -745,7 +856,14 @@ export default function AdminPage() {
                             variant="ghost"
                             size="sm"
                             className="w-fit"
-                            onClick={() => setPreviewUrl("")}
+                            onClick={() => {
+                              setPreviewUrl("")
+                              setSelectedImageFile(null)
+                              setCroppedAreaPixels(null)
+                              setImageCrop({ x: 0, y: 0 })
+                              setImageZoom(1)
+                              setImageInputKey((current) => current + 1)
+                            }}
                           >
                             <X className="mr-2 h-4 w-4" />
                             Clear preview
