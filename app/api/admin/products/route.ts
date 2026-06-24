@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     return unauthorized()
   }
 
-  const products = await getProducts({ site: "strongbuilt" })
+  const products = await getProducts()
 
   return NextResponse.json({ products })
 }

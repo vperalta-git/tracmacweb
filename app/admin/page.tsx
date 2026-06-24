@@ -35,7 +35,7 @@ import {
 import { Header } from "@/components/landing/header"
 import { Footer } from "@/components/landing/footer"
 import { BrandMark } from "@/components/brand-mark"
-import darkLogo from "@/assets/darklogo.png"
+import tmacLogo from "@/assets/tmaclogo.png"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -56,8 +56,6 @@ const adminNavItems = [
   { label: "Users", icon: UsersRound },
   { label: "Settings", icon: Settings2 },
 ] as const
-
-const catalogSites = [{ name: "Strongbuilt", shortName: "Strongbuilt", slug: "strongbuilt" }]
 
 type AdminSection = (typeof adminNavItems)[number]["label"]
 type ContactInquiry = {
@@ -126,7 +124,7 @@ export default function AdminPage() {
       return true
     }
 
-    return [product.name, product.brand, product.category, product.site, product.description, product.spec, product.badge]
+    return [product.name, product.brand, product.category, product.description, product.spec, product.badge]
       .filter(Boolean)
       .some((value) => value?.toLowerCase().includes(query))
   })
@@ -136,10 +134,6 @@ export default function AdminPage() {
   const categorySummaries = productCategories.map((category) => ({
     ...category,
     count: products.filter((product) => product.category === category.name).length,
-  }))
-  const siteSummaries = catalogSites.map((site) => ({
-    ...site,
-    count: products.filter((product) => product.site === site.slug).length,
   }))
   const brandSummaries = productBrands.map((brand) => ({
     ...brand,
@@ -152,8 +146,8 @@ export default function AdminPage() {
       description: "Monitor catalog coverage, product counts, and current admin storage status.",
     },
     Products: {
-      title: "Manage the Strongbuilt truck catalog",
-      description: "Add truck and bus names, images, descriptions, body categories, and key specifications.",
+      title: "Manage the TRACMAC product catalog",
+      description: "Add product names, images, descriptions, categories, and key specifications directly to the live catalog.",
     },
     Categories: {
       title: "Manage product categories",
@@ -161,7 +155,7 @@ export default function AdminPage() {
     },
     Brands: {
       title: "Manage product brands",
-      description: "Review supported Strongbuilt truck brands and how many products are currently assigned to each brand.",
+      description: "Review supported TRACMAC supplier brands and how many products are currently assigned to each brand.",
     },
     "Orders / Quotes": {
       title: "Orders and quotes",
@@ -421,11 +415,12 @@ export default function AdminPage() {
                       Admin
                     </Badge>
                     <h1 className="mt-7 text-4xl font-extrabold leading-tight tracking-normal text-balance sm:text-5xl lg:text-6xl">
-                      Manage the <span className="text-primary">Strongbuilt</span> truck catalog
+                      Manage the <span className="text-primary">TRACMAC</span> product catalog
                     </h1>
                     <div className="mt-6 h-0.5 w-16 rounded-full bg-primary" />
                     <p className="mt-7 max-w-lg text-base leading-8 text-white/76 sm:text-lg">
-                      Add truck names, images, body categories, and key specifications directly to the live catalog.
+                      Add product names, images, descriptions, categories, and key specifications directly to the live
+                      catalog.
                     </p>
 
                     <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -531,7 +526,7 @@ export default function AdminPage() {
               <div className="min-h-screen bg-[#f6f8fb] text-[#0f2435] lg:grid lg:grid-cols-[232px_minmax(0,1fr)]">
                 <aside className="flex flex-col bg-gradient-to-b from-[#061625] via-[#0f2435] to-[#102d45] px-3 py-5 text-white lg:min-h-screen">
                   <div className="flex items-center justify-between px-3">
-                    <Image src={darkLogo} alt="Strongbuilt logo" className="h-12 w-auto object-contain" priority />
+                    <Image src={tmacLogo} alt="TRACMAC Marketing logo" className="h-12 w-auto object-contain" priority />
                     <button
                       type="button"
                       className="rounded-md p-2 text-white/80 transition hover:bg-white/10 hover:text-white lg:hidden"
@@ -642,9 +637,9 @@ export default function AdminPage() {
                     <Alert className="mt-6 flex items-start gap-4 border-orange-200 bg-orange-50/85 text-[#0f2435] shadow-sm">
                       <HardDrive className="mt-0.5 h-5 w-5 text-primary" />
                       <div className="min-w-0 flex-1">
-                        <AlertTitle className="font-extrabold">Shared MongoDB catalog is in use</AlertTitle>
+                        <AlertTitle className="font-extrabold">Local storage is in use</AlertTitle>
                         <AlertDescription className="text-sm text-[#53677a]">
-                          Products are stored in MongoDB and published to the Strongbuilt truck and bus catalog.
+                          Products are stored on this device in local storage. Changes will only be visible on this device and not synced across other devices.
                         </AlertDescription>
                       </div>
                       <Button type="button" variant="outline" size="sm" className="hidden border-[#d6dee8] bg-white text-[#0f2435] sm:inline-flex">
@@ -710,8 +705,6 @@ export default function AdminPage() {
                           </select>
                         </div>
                       </div>
-
-                      <input type="hidden" name="site" value="strongbuilt" />
 
                       <div className="grid gap-5 md:grid-cols-2">
                         <div className="space-y-2">
@@ -951,9 +944,6 @@ export default function AdminPage() {
                               </p>
                               <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#33485f]">{product.description}</p>
                               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-[#53677a]">
-                                <span className="rounded bg-orange-50 px-2 py-0.5 font-bold text-primary">
-                                  {catalogSites.find((site) => site.slug === product.site)?.shortName ?? "Strongbuilt"}
-                                </span>
                                 <span>{product.category}</span>
                                 {product.badge && <span className="rounded bg-[#eef3f7] px-2 py-0.5">{product.badge}</span>}
                                 {product.isDemo && <span>Demo item</span>}
@@ -962,7 +952,7 @@ export default function AdminPage() {
                             </div>
 
                             <div className="flex items-center justify-between gap-2 sm:flex-col sm:items-end">
-                              <BrandMark brand={product.brand} className="relative right-auto top-auto z-auto h-10 w-[58px]" />
+                              <BrandMark brand={product.brand} badge className="relative right-auto top-auto z-auto h-10 w-[58px]" />
                               <div className="flex gap-1">
                                 <Button
                                   type="button"
@@ -1005,7 +995,6 @@ export default function AdminPage() {
                               {[
                                 { label: "Total Products", value: products.length, note: "Live catalog records", icon: PackagePlus },
                                 { label: "Admin Added", value: adminProductCount, note: "Stored in MongoDB", icon: Boxes },
-                                { label: "Strongbuilt", value: siteSummaries.find((site) => site.slug === "strongbuilt")?.count ?? 0, note: "Truck catalog records", icon: ShieldCheck },
                                 { label: "With Images", value: productsWithImages, note: "Product visuals available", icon: ImagePlus },
                                 { label: "Categories", value: categorySummaries.filter((category) => category.count > 0).length, note: "Currently populated", icon: FolderOpen },
                               ].map((item) => (
@@ -1072,7 +1061,7 @@ export default function AdminPage() {
                               {brandSummaries.map((brand) => (
                                 <div key={brand.slug} className="flex items-center justify-between rounded-lg border border-[#d6dee8] bg-white p-4">
                                   <div>
-                                    <BrandMark brand={brand.name} className="relative right-auto top-auto z-auto" />
+                                    <BrandMark brand={brand.name} badge className="relative right-auto top-auto z-auto" />
                                     <p className="mt-3 text-sm font-extrabold text-[#0f2435]">{brand.name}</p>
                                   </div>
                                   <Badge className="bg-orange-50 text-primary hover:bg-orange-50">{brand.count}</Badge>
@@ -1193,7 +1182,7 @@ export default function AdminPage() {
                       </div>
                     )}
                     <footer className="mt-8 border-t border-[#d6dee8] py-5 text-center text-sm text-[#53677a]">
-                      &copy; {new Date().getFullYear()} Strongbuilt. All rights reserved.
+                      &copy; {new Date().getFullYear()} TRACMAC Marketing. All rights reserved.
                     </footer>
                   </div>
                 </div>

@@ -4,39 +4,39 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.981 0.006 82);
-  --foreground: oklch(0.2 0.026 242);
-  --card: oklch(0.998 0.002 82);
-  --card-foreground: oklch(0.2 0.026 242);
-  --popover: oklch(0.998 0.002 82);
-  --popover-foreground: oklch(0.2 0.026 242);
-  --primary: oklch(0.63 0.18 45);
-  --primary-foreground: oklch(0.985 0.006 82);
-  --secondary: oklch(0.94 0.018 84);
-  --secondary-foreground: oklch(0.225 0.026 242);
-  --muted: oklch(0.952 0.012 86);
-  --muted-foreground: oklch(0.45 0.02 242);
-  --accent: oklch(0.79 0.13 62);
-  --accent-foreground: oklch(0.18 0.024 242);
+  --background: oklch(0.982 0.006 75);
+  --foreground: oklch(0.18 0.015 62);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0 0);
+  --primary: oklch(0.68 0.19 48);
+  --primary-foreground: oklch(0.985 0.004 65);
+  --secondary: oklch(0.94 0.014 82);
+  --secondary-foreground: oklch(0.2 0.018 55);
+  --muted: oklch(0.948 0.011 78);
+  --muted-foreground: oklch(0.44 0.018 55);
+  --accent: oklch(0.74 0.17 55);
+  --accent-foreground: oklch(0.17 0.012 55);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.875 0.014 84);
-  --input: oklch(0.875 0.014 84);
-  --ring: oklch(0.63 0.18 45);
-  --chart-1: oklch(0.63 0.18 45);
-  --chart-2: oklch(0.39 0.06 220);
-  --chart-3: oklch(0.47 0.075 148);
+  --border: oklch(0.875 0.011 76);
+  --input: oklch(0.875 0.011 76);
+  --ring: oklch(0.68 0.19 48);
+  --chart-1: oklch(0.68 0.19 48);
+  --chart-2: oklch(0.36 0.04 210);
+  --chart-3: oklch(0.42 0.07 145);
   --chart-4: oklch(0.76 0.15 72);
   --chart-5: oklch(0.58 0.14 28);
   --radius: 0.5rem;
-  --sidebar: oklch(0.981 0.006 82);
-  --sidebar-foreground: oklch(0.2 0.026 242);
-  --sidebar-primary: oklch(0.63 0.18 45);
-  --sidebar-primary-foreground: oklch(0.985 0.006 82);
-  --sidebar-accent: oklch(0.94 0.018 84);
-  --sidebar-accent-foreground: oklch(0.2 0.026 242);
-  --sidebar-border: oklch(0.875 0.014 84);
-  --sidebar-ring: oklch(0.63 0.18 45);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.2 0 0);
+  --sidebar-primary: oklch(0.68 0.19 48);
+  --sidebar-primary-foreground: oklch(0.985 0.004 65);
+  --sidebar-accent: oklch(0.94 0.018 65);
+  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-border: oklch(0.88 0.012 65);
+  --sidebar-ring: oklch(0.68 0.19 48);
 }
 
 .dark {
@@ -121,40 +121,289 @@
   }
   body {
     @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
   }
 }
 
-@layer utilities {
-  .hero-surface {
-    background:
-      radial-gradient(circle at 18% 20%, rgba(70, 70, 70, 0.34), transparent 40%),
-      linear-gradient(135deg, #202020 0%, #151515 52%, #0a0a0a 100%);
+@layer components {
+  .section-shell {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  .inventory-surface {
-    background:
-      radial-gradient(ellipse at 50% 2%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 28%, rgba(255, 255, 255, 0) 62%),
-      radial-gradient(ellipse at 50% 34%, rgba(236, 119, 48, 0.13) 0%, rgba(236, 119, 48, 0.06) 34%, rgba(236, 119, 48, 0) 72%),
-      linear-gradient(90deg, #d7dcdf 0%, #e9ecee 7%, #f7f8f8 16%, #ffffff 28%, #fff8f2 50%, #ffffff 72%, #f6f7f7 84%, #e5e9eb 93%, #d2d8dc 100%);
+  .section-eyebrow {
+    @apply text-xs font-bold uppercase tracking-[0.18em] text-primary;
   }
 
-  .workspace-surface {
-    background:
-      linear-gradient(180deg, var(--background) 0%, color-mix(in oklch, var(--secondary) 64%, var(--background)) 100%);
+  .section-title {
+    @apply mt-3 text-3xl font-bold leading-tight text-foreground text-balance sm:text-4xl;
   }
 
-  .brand-marquee {
+  .section-copy {
+    @apply mt-4 text-base leading-7 text-muted-foreground text-pretty sm:text-lg;
+  }
+
+  .surface-card {
+    @apply rounded-lg border border-border/80 bg-card shadow-sm shadow-black/5;
+  }
+
+  .dark-panel {
+    @apply bg-[#232d39] text-white;
+  }
+
+  .trusted-brands-section {
+    background: #faf7f2;
+    padding: 80px 0;
+    overflow: hidden;
+  }
+
+  .section-header {
+    max-width: 760px;
+    margin: 0 auto 28px;
+    text-align: center;
+    padding: 0 24px;
+  }
+
+  .trusted-brands-eyebrow {
+    color: #f26700;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .trusted-brands-accent {
+    width: 64px;
+    height: 2px;
+    background: #f26700;
+    margin: 0 auto 20px;
+  }
+
+  .trusted-brands-description {
+    color: #24384a;
+    font-size: 16px;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .caution-tape-separator {
+    position: relative;
+    height: 34px;
+    margin: 0 auto 38px;
+    overflow: hidden;
+    border-block: 1px solid rgba(15, 36, 53, 0.18);
+    background:
+      linear-gradient(rgba(255, 193, 7, 0.92), rgba(255, 193, 7, 0.92)),
+      repeating-linear-gradient(
+        135deg,
+        rgba(6, 22, 37, 0.92) 0 12px,
+        transparent 12px 27px
+      );
+    box-shadow: 0 8px 20px rgba(15, 36, 53, 0.08);
+  }
+
+  .caution-tape-separator::before,
+  .caution-tape-separator::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .caution-tape-separator::before {
+    left: 0;
+    background: linear-gradient(to right, #faf7f2, rgba(250, 247, 242, 0));
+  }
+
+  .caution-tape-separator::after {
+    right: 0;
+    background: linear-gradient(to left, #faf7f2, rgba(250, 247, 242, 0));
+  }
+
+  .caution-tape-track {
+    display: flex;
     width: max-content;
+    min-width: 200%;
+    height: 100%;
+    align-items: center;
+    gap: 28px;
+    color: #061625;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.72;
+    animation: cautionTapeDrift 34s linear infinite;
+  }
+
+  .caution-tape-track span {
+    display: inline-flex;
+    align-items: center;
+    gap: 28px;
     white-space: nowrap;
+  }
+
+  .caution-tape-track span::after {
+    content: "PPE REQUIRED";
+  }
+
+  .logo-marquee {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 8px 0;
+  }
+
+  .logo-marquee::before,
+  .logo-marquee::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 140px;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .logo-marquee::before {
+    left: 0;
+    background: linear-gradient(to right, #faf7f2, transparent);
+  }
+
+  .logo-marquee::after {
+    right: 0;
+    background: linear-gradient(to left, #faf7f2, transparent);
+  }
+
+  .logo-track {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 32px;
+    width: max-content;
+    animation: trustedBrandsMarquee 20s linear infinite;
     will-change: transform;
   }
 
-  @keyframes brand-marquee-px {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(var(--marquee-distance, -50%), 0, 0);
-    }
+  .logo-marquee:hover .logo-track {
+    animation-play-state: paused;
+  }
+
+  .logo-card {
+    flex: 0 0 auto;
+    width: 190px;
+    height: 96px;
+    background: #ffffff;
+    border: 1px solid #d6dee8;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 36, 53, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 28px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .logo-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(242, 103, 0, 0.35);
+    box-shadow: 0 14px 34px rgba(15, 36, 53, 0.12);
+  }
+
+  .logo-card img {
+    max-width: 135px;
+    max-height: 52px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: grayscale(1);
+    opacity: 0.6;
+    transition: filter 0.25s ease, opacity 0.25s ease;
+  }
+
+  .logo-card:hover img {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+}
+
+@keyframes trustedBrandsMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes cautionTapeDrift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .trusted-brands-section {
+    padding: 64px 0;
+  }
+
+  .section-header {
+    margin-bottom: 22px;
+  }
+
+  .caution-tape-separator {
+    height: 28px;
+    margin-bottom: 28px;
+  }
+
+  .caution-tape-separator::before,
+  .caution-tape-separator::after {
+    width: 48px;
+  }
+
+  .caution-tape-track {
+    gap: 20px;
+    font-size: 9px;
+  }
+
+  .logo-track {
+    gap: 20px;
+    animation-duration: 18s;
+  }
+
+  .logo-card {
+    width: 150px;
+    height: 82px;
+    padding: 16px 22px;
+  }
+
+  .logo-card img {
+    max-width: 110px;
+    max-height: 42px;
+  }
+
+  .logo-marquee::before,
+  .logo-marquee::after {
+    width: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-marquee {
+    overflow-x: auto;
+  }
+
+  .logo-track {
+    animation: none;
+  }
+
+  .caution-tape-track {
+    animation: none;
   }
 }

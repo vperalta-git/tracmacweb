@@ -1,88 +1,150 @@
-import Link from "next/link"
 import Image, { type StaticImageData } from "next/image"
-import { ArrowUpRight, Box, Construction, Container, Snowflake, Truck, Wrench } from "lucide-react"
-import { BrandMark } from "@/components/brand-mark"
+import Link from "next/link"
+import {
+  Anchor,
+  ArrowRight,
+  Ear,
+  Eye,
+  Footprints,
+  Hand,
+  HardHat,
+  ShieldCheck,
+  Wind,
+  type LucideIcon,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import dumpTruckImage from "@/assets/forland/Dump Truck 3CBM.png"
-import cargoTruckImage from "@/assets/forland/Cargo Truck Double Cabin .png"
-import trailerImage from "@/assets/cimc-rjst-trailer/40FT Flat-bed Trailer.png"
-import tractorImage from "@/assets/shacman/SX42554V324.png"
-import reeferImage from "@/assets/forland/14FOOTER COMMINS & 17FOOTER COMMINS Specification.png"
-import utilityImage from "@/assets/forland/46FT Aerial Work Truck Specification.png"
+import { type ProductCategoryName } from "@/lib/product-data"
+import footProtectionImage from "@/assets/homedesign/category-foot-protection.png"
+import headProtectionImage from "@/assets/homedesign/category-head-protection.png"
+import fallProtectionImage from "@/assets/homedesign/category-fall-protection.png"
+import eyeFaceProtectionImage from "@/assets/homedesign/category-eye-face-protection.png"
+import hearingProtectionImage from "@/assets/homedesign/category-hearing-protection.png"
+import respiratoryProtectionImage from "@/assets/homedesign/category-respiratory-protection.png"
+import handProtectionImage from "@/assets/homedesign/category-hand-protection.png"
+import workwearImage from "@/assets/homedesign/category-workwear.png"
 
-type TruckCategory = {
-  icon: typeof Truck
-  name: string
-  brand: string
-  spec: string
-  badge: string
+type FeaturedCategory = {
+  icon: LucideIcon
+  name: ProductCategoryName
+  description: string
   image: StaticImageData
-  href: string
 }
 
-const trucks: TruckCategory[] = [
-  { icon: Construction, name: "Dump Trucks", brand: "Forland", spec: "Tipper units for aggregates, site hauling, and materials movement.", badge: "Worksite", image: dumpTruckImage, href: "/products?brand=Forland" },
-  { icon: Box, name: "Cargo Trucks", brand: "Forland", spec: "Double-cabin and route-ready cargo bodies for daily commercial delivery.", badge: "Delivery", image: cargoTruckImage, href: "/products?brand=Forland" },
-  { icon: Container, name: "Trailers", brand: "CIMC RJST Trailer", spec: "Flatbed, tank, fuel, asphalt, and mixer trailers for heavy operations.", badge: "Heavy Duty", image: trailerImage, href: "/products?brand=CIMC%20RJST%20Trailer" },
-  { icon: Truck, name: "Tractor Heads", brand: "SHACMAN", spec: "Prime movers for container hauling, long-haul routes, and fleet growth.", badge: "Fleet", image: tractorImage, href: "/products?brand=SHACMAN" },
-  { icon: Snowflake, name: "Refrigerated Builds", brand: "Strongbuilt", spec: "Cold-chain capable truck sourcing for food, pharma, and grocery routes.", badge: "Cold Chain", image: reeferImage, href: "/products" },
-  { icon: Wrench, name: "Special Purpose", brand: "Forland", spec: "Aerial, boom, service, and utility builds adapted to field requirements.", badge: "Configurable", image: utilityImage, href: "/products?brand=Forland" },
+const featuredCategories: FeaturedCategory[] = [
+  {
+    icon: Footprints,
+    name: "Foot Protection",
+    description: "Safety footwear for daily site work, wet floors, and heavy-duty industrial environments.",
+    image: footProtectionImage,
+  },
+  {
+    icon: HardHat,
+    name: "Head Protection",
+    description: "Hard hats, bump caps, and helmet accessories for construction and industrial sites.",
+    image: headProtectionImage,
+  },
+  {
+    icon: Anchor,
+    name: "Fall Protection",
+    description: "Harnesses, lanyards, and anchors for elevated work and controlled access zones.",
+    image: fallProtectionImage,
+  },
+  {
+    icon: Eye,
+    name: "Eye and Face Protection",
+    description: "Safety glasses, goggles, and shields for impact, splash, and dust protection.",
+    image: eyeFaceProtectionImage,
+  },
+  {
+    icon: Ear,
+    name: "Hearing Protection",
+    description: "Earplugs and earmuffs for high-noise production lines and machinery areas.",
+    image: hearingProtectionImage,
+  },
+  {
+    icon: Wind,
+    name: "Respiratory Protection",
+    description: "Masks and respirators for dust, fumes, and airborne particulate control.",
+    image: respiratoryProtectionImage,
+  },
+  {
+    icon: Hand,
+    name: "Hand Protection",
+    description: "Work gloves for cut resistance, grip, chemical handling, and general protection.",
+    image: handProtectionImage,
+  },
+  {
+    icon: ShieldCheck,
+    name: "Workwear",
+    description: "Durable uniforms, coveralls, and high-visibility garments for daily operations.",
+    image: workwearImage,
+  },
 ]
 
 export function ProductShowcase() {
   return (
-    <section className="bg-[#faf7f2] py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <section className="relative overflow-hidden bg-[#fbfaf7] py-18 lg:py-24">
+      <div
+        className="pointer-events-none absolute right-0 top-10 h-80 w-80 opacity-[0.07]"
+        style={{
+          backgroundImage: "radial-gradient(circle, #f97316 2px, transparent 2px)",
+          backgroundSize: "18px 18px",
+        }}
+      />
+      <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rotate-45 border-y-[28px] border-orange-100/65" />
+
+      <div className="section-shell relative">
+        <div className="mb-10 flex flex-col gap-6 lg:mb-12 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
-            <span className="text-sm font-semibold uppercase tracking-wider text-primary">Featured Truck Builds</span>
-            <h2 className="mt-3 text-3xl font-bold text-foreground text-balance sm:text-4xl">
-              Practical truck configurations for real business routes
+            <span className="text-sm font-extrabold uppercase tracking-[0.22em] text-primary">Featured Categories</span>
+            <h2 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-[#0b2038] text-balance sm:text-5xl">
+              PPE essentials organized for quick procurement
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground text-pretty">
-              Start from common commercial bodies, then inquire for a unit that fits your cargo, route, and payload.
+            <p className="mt-5 max-w-3xl text-base leading-7 text-slate-600 text-pretty">
+              Start with the most requested safety gear, then jump into the catalog to filter by brand, category, specs,
+              and certification notes.
             </p>
           </div>
-          <Button size="lg" asChild>
-            <Link href="/products">Browse Inventory</Link>
+          <Button size="lg" className="h-12 px-7 shadow-lg shadow-orange-950/15" asChild>
+            <Link href="/products">
+              Browse Full Catalog
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {trucks.map((truck) => (
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {featuredCategories.map((category) => (
             <Link
-              key={truck.name}
-              href={truck.href}
-              className="group overflow-hidden rounded-lg border border-border bg-white shadow-sm shadow-black/5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-black/10"
+              key={category.name}
+              href={`/products?category=${encodeURIComponent(category.name)}`}
+              className="group relative flex min-h-[390px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-900/8 transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-slate-900/14"
             >
-              <div className="h-1 bg-primary" />
-              <div className="p-4">
-                <div className="relative mb-5 flex aspect-[16/10] items-center justify-center overflow-hidden rounded-md bg-[linear-gradient(135deg,#dedbd6_0%,#ffffff_44%,#f8efe7_100%)]">
-                  <BrandMark
-                    brand={truck.brand}
-                    compact
-                    className="absolute left-3 top-3 z-10 border-0 bg-background/90 shadow-sm backdrop-blur-sm"
-                  />
-                  <Badge className="absolute right-3 top-3 bg-primary text-primary-foreground">{truck.badge}</Badge>
-                  <Image
-                    src={truck.image}
-                    alt={truck.name}
-                    className="h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-[1.04]"
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  />
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                    <truck.icon className="h-5 w-5" />
+              <div className="absolute inset-x-0 top-0 z-20 mx-auto h-1 w-[42%] rounded-b-full bg-primary transition-all duration-300 group-hover:w-1/2 group-hover:h-1.5" />
+              <div className="flex w-full flex-col">
+                <div className="relative h-44 overflow-hidden p-2">
+                  <div className="relative h-full overflow-hidden rounded-md">
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium uppercase tracking-wider text-primary">{truck.brand}</p>
-                    <h3 className="mt-1 font-semibold text-foreground transition-colors group-hover:text-primary">{truck.name}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{truck.spec}</p>
-                    <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
-                      View category <ArrowUpRight className="h-4 w-4" />
-                    </span>
+                </div>
+
+                <div className="relative flex flex-1 flex-col p-5 pt-0">
+                  <div className="-mt-8 mb-4 flex h-14 w-14 items-center justify-center rounded-lg border border-orange-100 bg-orange-50 text-primary shadow-lg shadow-slate-900/8">
+                    <category.icon className="h-7 w-7" />
+                  </div>
+                  <h3 className="text-xl font-extrabold leading-tight text-[#0b2038]">{category.name}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{category.description}</p>
+
+                  <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-4 text-sm font-extrabold text-primary">
+                    <span>View category</span>
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                   </div>
                 </div>
               </div>

@@ -8,8 +8,6 @@ const publicRoutes = [
   '/products',
   '/industries',
   '/contact',
-  '/strongbuilt',
-  '/strongbuilt/products',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

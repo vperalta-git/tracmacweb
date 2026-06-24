@@ -36,7 +36,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email Us",
-    details: ["sales@strongbuilt.com.ph"],
+    details: ["info@coretech.com.ph"],
   },
 ]
 
@@ -54,11 +54,11 @@ export function Contact() {
 
   function applyQuoteContext(context: QuoteContext) {
     const label =
-      context.type === "truck"
-        ? `Truck inquiry: ${context.value}`
-        : context.type === "brand"
-          ? `Brand inquiry: ${context.value}`
-          : "General truck inquiry"
+      context.type === "product"
+        ? `Product inquiry: ${context.value}`
+        : context.type === "category"
+          ? `Category inquiry: ${context.value}`
+          : "General PPE inquiry"
 
     setInquiryContext(label)
     setFormData((current) => ({
@@ -70,11 +70,11 @@ export function Contact() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const product = params.get("product")
-    const brand = params.get("brand")
+    const category = params.get("category")
     const urlContext: QuoteContext | null = product
-      ? { type: "truck", value: product }
-      : brand
-        ? { type: "brand", value: brand }
+      ? { type: "product", value: product }
+      : category
+        ? { type: "category", value: category }
         : null
 
     if (urlContext) {
@@ -110,12 +110,26 @@ export function Contact() {
     setStatusMessage("")
 
     try {
+      const saveResponse = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          inquiryContext,
+        }),
+      })
+      const saveResult = (await saveResponse.json()) as { message?: string }
+
+      if (!saveResponse.ok) {
+        throw new Error(saveResult.message ?? "Unable to save your inquiry right now.")
+      }
+
       const result = await sendContactMessage(formData)
       const savedLocally = typeof result === "object" && result !== null && "local" in result
 
       setStatusMessage(
         savedLocally
-          ? "Demo inquiry saved locally. Add EmailJS keys later to send real emails."
+          ? "Your inquiry was saved. Email notifications are not configured yet."
           : "Your message was sent successfully. We will get back to you within 24 hours.",
       )
       setFormData({
@@ -140,34 +154,46 @@ export function Contact() {
   }
 
   return (
-    <section id="contact" className="bg-[#faf7f2] py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-primary font-semibold text-sm uppercase tracking-wider">Contact Us</span>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground text-balance">
+    <section id="contact" className="relative overflow-hidden bg-[#fbfaf7] py-16 lg:py-20">
+      <div
+        className="pointer-events-none absolute left-0 top-0 h-72 w-72 opacity-[0.08]"
+        style={{
+          backgroundImage: "radial-gradient(circle, #f97316 3px, transparent 3px)",
+          backgroundSize: "20px 20px",
+        }}
+      />
+      <div className="pointer-events-none absolute -right-20 top-0 h-96 w-96 rotate-45 border-y-[36px] border-orange-100/55" />
+      <div className="pointer-events-none absolute -bottom-28 -left-20 h-56 w-56 rounded-full border-[6px] border-orange-100/70" />
+
+      <div className="section-shell relative">
+        <div className="mx-auto mb-10 max-w-3xl text-center">
+          <span className="text-sm font-extrabold uppercase tracking-[0.28em] text-primary">Contact Us</span>
+          <h2 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-[#0b2038] sm:text-6xl">
             Get in touch
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground text-pretty">
-            Have questions about our trucks or need a custom fleet quote? Our team is ready to help you find the right
-            unit for your business.
+          <div className="mx-auto mt-4 h-0.5 w-14 rounded-full bg-primary" />
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">
+            Have questions about our products or need a custom quote? Our team is ready to help you find the right
+            safety solutions.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-5 gap-12">
-          {/* Contact Information */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.95fr_1.65fr]">
+          <div className="space-y-4">
             {contactInfo.map((item) => (
-              <Card key={item.title} className="border-border bg-white shadow-sm shadow-black/5">
-                <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0 h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <item.icon className="h-6 w-6 text-primary" />
+              <Card
+                key={item.title}
+                className="overflow-hidden border-slate-200 bg-white py-0 shadow-lg shadow-slate-900/8"
+              >
+                <CardContent className="border-l-2 border-primary p-5 sm:p-6">
+                  <div className="flex items-center gap-5">
+                    <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-orange-50 text-primary">
+                      <item.icon className="h-8 w-8" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground">{item.title}</h3>
+                      <h3 className="text-xl font-extrabold text-[#0b2038]">{item.title}</h3>
                       {item.details.map((detail, index) => (
-                        <p key={index} className="text-sm text-muted-foreground">
+                        <p key={index} className="mt-1 text-sm leading-6 text-slate-600">
                           {detail}
                         </p>
                       ))}
@@ -178,109 +204,112 @@ export function Contact() {
             ))}
           </div>
 
-          {/* Contact Form */}
-          <div className="lg:col-span-3">
-            <Card className="border-border bg-white shadow-xl shadow-black/10">
-              <CardContent className="p-8">
-                <h3 className="text-xl font-semibold text-foreground mb-6">Send Us a Message</h3>
-                {inquiryContext && (
-                  <div className="mb-6 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-medium text-foreground">
-                    {inquiryContext}
-                  </div>
-                )}
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                        Full Name *
-                      </label>
-                      <Input
-                        id="name"
-                        name="name"
-                        type="text"
-                        required
-                        placeholder="John Smith"
-                        value={formData.name}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="company" className="block text-sm font-medium text-foreground mb-2">
-                        Company Name
-                      </label>
-                      <Input
-                        id="company"
-                        name="company"
-                        type="text"
-                        placeholder="ABC Construction Ltd."
-                        value={formData.company}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                        Email Address *
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        placeholder="john@company.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
-                        Phone Number
-                      </label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        placeholder="+63 (917) 891-3681"
-                        value={formData.phone}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
+          <Card className="border-slate-200 bg-white py-0 shadow-xl shadow-slate-900/10">
+            <CardContent className="p-6 sm:p-8 lg:p-10">
+              <h3 className="text-2xl font-extrabold text-[#0b2038]">Send Us a Message</h3>
+              <div className="mt-3 h-0.5 w-14 rounded-full bg-primary" />
+              {inquiryContext && (
+                <div className="mt-6 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-medium text-[#0b2038]">
+                  {inquiryContext}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+                <div className="grid gap-5 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                      Message *
+                    <label htmlFor="name" className="mb-2 block text-sm font-bold text-[#0b2038]">
+                      Full Name *
                     </label>
-                    <Textarea
-                      id="message"
-                      name="message"
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
                       required
-                      placeholder="Tell us about your truck requirements, preferred body type, quantity needed, route, payload, or any questions you have."
-                      rows={5}
-                      value={formData.message}
+                      placeholder="John Smith"
+                      value={formData.name}
                       onChange={handleChange}
+                      className="h-11 border-slate-300 bg-white"
                     />
                   </div>
+                  <div>
+                    <label htmlFor="company" className="mb-2 block text-sm font-bold text-[#0b2038]">
+                      Company Name
+                    </label>
+                    <Input
+                      id="company"
+                      name="company"
+                      type="text"
+                      placeholder="ABC Construction Ltd."
+                      value={formData.company}
+                      onChange={handleChange}
+                      className="h-11 border-slate-300 bg-white"
+                    />
+                  </div>
+                </div>
 
-                  <Button type="submit" size="lg" className="w-full sm:w-auto">
-                    {isSending ? "Sending..." : "Submit Inquiry"}
-                  </Button>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="email" className="mb-2 block text-sm font-bold text-[#0b2038]">
+                      Email Address *
+                    </label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      placeholder="john@company.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="h-11 border-slate-300 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="mb-2 block text-sm font-bold text-[#0b2038]">
+                      Phone Number
+                    </label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+63 (917) 891-3681"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="h-11 border-slate-300 bg-white"
+                    />
+                  </div>
+                </div>
 
-                  {statusMessage && (
-                    <p className="text-sm text-muted-foreground" aria-live="polite">
-                      {statusMessage}
-                    </p>
-                  )}
+                <div>
+                  <label htmlFor="message" className="mb-2 block text-sm font-bold text-[#0b2038]">
+                    Message *
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    required
+                    placeholder="Tell us about your PPE requirements, quantities needed, or any questions you have..."
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="border-slate-300 bg-white"
+                  />
+                </div>
 
-                  <p className="text-sm text-muted-foreground">
-                    * Required fields. We typically respond within 24 business hours.
+                <Button type="submit" size="lg" className="h-12 px-8">
+                  {isSending ? "Sending..." : "Submit Inquiry"}
+                </Button>
+
+                {statusMessage && (
+                  <p className="text-sm text-slate-600" aria-live="polite">
+                    {statusMessage}
                   </p>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
+                )}
+
+                <p className="text-sm text-slate-500">
+                  * Required fields. We typically respond within 24 business hours.
+                </p>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>

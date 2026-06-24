@@ -10,7 +10,12 @@ type QuoteLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
   children: ReactNode
 }
 
-export function QuoteLink({ context = { type: "general", value: "Truck quote" }, children, onClick, ...props }: QuoteLinkProps) {
+export function QuoteLink({
+  context = { type: "general", value: "PPE quote" },
+  children,
+  onClick,
+  ...props
+}: QuoteLinkProps) {
   const pathname = usePathname()
   const router = useRouter()
 

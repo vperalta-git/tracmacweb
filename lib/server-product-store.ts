@@ -2,13 +2,7 @@ import { mkdir, unlink, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { getBrandByName } from "@/lib/brand-data"
 import { getMongoDb } from "@/lib/mongodb"
-import {
-  demoProducts,
-  productCategories,
-  type CatalogProduct,
-  type ProductCategoryName,
-  type ProductSiteSlug,
-} from "@/lib/product-data"
+import { demoProducts, productCategories, type CatalogProduct, type ProductCategoryName } from "@/lib/product-data"
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "products")
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -24,10 +18,6 @@ type StoredProduct = Omit<CatalogProduct, "isDemo">
 
 function isValidCategory(category: string): category is ProductCategoryName {
   return productCategories.some((item) => item.name === category)
-}
-
-function isValidSite(site: string): site is ProductSiteSlug {
-  return site === "tracmac" || site === "strongbuilt"
 }
 
 function cleanText(value: FormDataEntryValue | null) {
@@ -51,11 +41,9 @@ function normalizeProduct(product: Partial<CatalogProduct> | null): CatalogProdu
     image?: string
     images?: string[]
     specs?: string
-    siteSlug?: string
   }
   const spec = product.spec ?? legacyProduct.specs
   const imageUrl = product.imageUrl ?? legacyProduct.image ?? legacyProduct.images?.[0]
-  const site = product.site ?? legacyProduct.siteSlug
 
   if (!product.id || !product.name || !product.category || !product.description || !spec) {
     return null
@@ -69,8 +57,7 @@ function normalizeProduct(product: Partial<CatalogProduct> | null): CatalogProdu
     id: product.id,
     name: product.name,
     category: product.category,
-    site: site && isValidSite(site) ? site : "strongbuilt",
-    brand: getBrandByName(cleanBrand(product.brand ?? ""))?.name ?? "Strongbuilt",
+    brand: getBrandByName(cleanBrand(product.brand ?? ""))?.name ?? "TRACMAC",
     description: product.description,
     spec,
     badge: product.badge || undefined,
@@ -86,32 +73,23 @@ async function productsCollection() {
   const collection = db.collection<StoredProduct>(PRODUCTS_COLLECTION)
 
   await collection.createIndex({ id: 1 }, { unique: true })
-  await collection.createIndex({ site: 1 })
   await collection.createIndex({ createdAt: -1 })
 
   return collection
 }
 
-export async function getProducts(options: { site?: ProductSiteSlug } = {}) {
+export async function getProducts() {
   try {
     const collection = await productsCollection()
-    const fallbackDemoProducts = demoProducts.map((product) => ({
-      ...product,
-      site: product.site ?? "strongbuilt",
-    }))
     const storedProducts = (await collection.find({}).sort({ createdAt: -1 }).toArray())
       .map((item) => normalizeProduct(item as Partial<CatalogProduct>))
       .filter((item): item is CatalogProduct => Boolean(item))
-      .filter((product) => !options.site || product.site === options.site)
     const storedIds = new Set(storedProducts.map((product) => product.id))
 
-    return [
-      ...storedProducts,
-      ...fallbackDemoProducts.filter((product) => !storedIds.has(product.id) && (!options.site || product.site === options.site)),
-    ]
+    return [...storedProducts, ...demoProducts.filter((product) => !storedIds.has(product.id))]
   } catch (error) {
     if (error instanceof Error && error.message.includes("MONGODB_URI")) {
-      return demoProducts.map((product) => ({ ...product, site: product.site ?? "strongbuilt" }))
+      return demoProducts
     }
 
     throw error
@@ -121,7 +99,6 @@ export async function getProducts(options: { site?: ProductSiteSlug } = {}) {
 function readProductPayload(formData: FormData) {
   const name = cleanText(formData.get("name"))
   const category = cleanText(formData.get("category"))
-  const site = cleanText(formData.get("site")) || "strongbuilt"
   const brand = cleanBrand(cleanText(formData.get("brand")))
   const description = cleanText(formData.get("description"))
   const spec = cleanText(formData.get("spec")) || cleanText(formData.get("specs"))
@@ -135,10 +112,6 @@ function readProductPayload(formData: FormData) {
     throw new Error("Please choose a valid product category.")
   }
 
-  if (!isValidSite(site)) {
-    throw new Error("Please choose a valid website for this product.")
-  }
-
   if (!isValidBrand(brand)) {
     throw new Error("Please choose a supported brand.")
   }
@@ -146,7 +119,6 @@ function readProductPayload(formData: FormData) {
   return {
     name,
     category,
-    site,
     brand: getBrandByName(brand)?.name ?? brand,
     description,
     spec,
