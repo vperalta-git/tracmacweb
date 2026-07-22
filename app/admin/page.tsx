@@ -43,7 +43,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { productBrands } from "@/lib/brand-data"
+import {
+  buildBrandOptions,
+  getBrandByName,
+  getBrandSlug,
+  normalizeBrand,
+  productBrands,
+} from "@/lib/brand-data"
 import { productCategories } from "@/lib/product-data"
 import type { CatalogProduct } from "@/lib/product-data"
 
@@ -116,6 +122,7 @@ export default function AdminPage() {
   const [isLoadingInquiries, setIsLoadingInquiries] = useState(false)
   const [formResetKey, setFormResetKey] = useState(0)
   const [activeAdminSection, setActiveAdminSection] = useState<AdminSection>("Products")
+  const [selectedBrandOption, setSelectedBrandOption] = useState("")
 
   const visibleAdminProducts = products.filter((product) => {
     const query = productSearchQuery.trim().toLowerCase()
@@ -135,9 +142,11 @@ export default function AdminPage() {
     ...category,
     count: products.filter((product) => product.category === category.name).length,
   }))
-  const brandSummaries = productBrands.map((brand) => ({
-    ...brand,
-    count: products.filter((product) => product.brand === brand.name).length,
+  const adminBrandOptions = buildBrandOptions(products.map((product) => product.brand))
+  const brandSummaries = adminBrandOptions.map((name) => ({
+    name,
+    slug: getBrandSlug(name),
+    count: products.filter((product) => normalizeBrand(product.brand) === normalizeBrand(name)).length,
   }))
 
   const adminSectionCopy: Record<AdminSection, { title: string; description: string }> = {
@@ -255,6 +264,7 @@ export default function AdminPage() {
 
   function handleEditProduct(product: CatalogProduct) {
     setEditingProduct(product)
+    setSelectedBrandOption(getBrandByName(product.brand) ? getBrandByName(product.brand)?.name ?? "" : "Other")
     setPreviewUrl(product.imageUrl ?? "")
     setSelectedImageFile(null)
     setCroppedAreaPixels(null)
@@ -266,6 +276,7 @@ export default function AdminPage() {
 
   function handleCancelEdit() {
     setEditingProduct(null)
+    setSelectedBrandOption("")
     setPreviewUrl("")
     setSelectedImageFile(null)
     setCroppedAreaPixels(null)
@@ -291,6 +302,9 @@ export default function AdminPage() {
     try {
       if (editingProduct) {
         formData.set("id", editingProduct.id)
+        if (editingProduct._id) {
+          formData.set("_id", editingProduct._id)
+        }
       }
 
       if (selectedImageFile && previewUrl && croppedAreaPixels) {
@@ -338,6 +352,7 @@ export default function AdminPage() {
 
     form.reset()
     setEditingProduct(null)
+    setSelectedBrandOption("")
     setPreviewUrl("")
     setSelectedImageFile(null)
     setCroppedAreaPixels(null)
@@ -359,7 +374,7 @@ export default function AdminPage() {
     const response = await fetch("/api/admin/products", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: product.id }),
+      body: JSON.stringify({ id: product.id, _id: product._id }),
     })
 
     setDeletingProductId("")
@@ -690,7 +705,8 @@ export default function AdminPage() {
                           <select
                             id="brand"
                             name="brand"
-                            defaultValue={editingProduct?.brand ?? ""}
+                            value={selectedBrandOption}
+                            onChange={(event) => setSelectedBrandOption(event.target.value)}
                             className="h-10 w-full rounded-md border border-[#d6dee8] bg-white px-3 text-sm text-[#0f2435] shadow-xs outline-none transition focus:border-primary focus:ring-[3px] focus:ring-primary/20"
                             required
                           >
@@ -702,7 +718,18 @@ export default function AdminPage() {
                                 {brand.name}
                               </option>
                             ))}
+                            <option value="Other">Other</option>
                           </select>
+                          {selectedBrandOption === "Other" && (
+                            <Input
+                              id="customBrand"
+                              name="customBrand"
+                              placeholder="Enter custom brand name"
+                              defaultValue={editingProduct && !getBrandByName(editingProduct.brand) ? editingProduct.brand : ""}
+                              className="h-10 border-[#d6dee8] bg-white focus-visible:border-primary focus-visible:ring-primary/20"
+                              required
+                            />
+                          )}
                         </div>
                       </div>
 
@@ -927,6 +954,10 @@ export default function AdminPage() {
                                 <Image
                                   src={product.imageUrl}
                                   alt={product.name}
+                                  onError={(event) => {
+                                    event.currentTarget.onerror = null
+                                    event.currentTarget.src = "/placeholder.jpg"
+                                  }}
                                   width={142}
                                   height={128}
                                   unoptimized

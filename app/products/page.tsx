@@ -10,14 +10,19 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
+  Cone,
+  Disc3,
   Ear,
   Eye,
   Feather,
+  Flame,
+  FlaskConical,
   FileText,
   Footprints,
   Grid2X2,
   Hand,
   HardHat,
+  HeartPulse,
   Mountain,
   PackageOpen,
   Search,
@@ -27,6 +32,7 @@ import {
   Trash2,
   X,
   Wind,
+  Wrench,
   type LucideIcon,
 } from "lucide-react"
 import { BrandMark } from "@/components/brand-mark"
@@ -43,12 +49,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { productBrands } from "@/lib/brand-data"
-import { productCategories, type CatalogProduct, type ProductCategoryName } from "@/lib/product-data"
+import {
+  buildBrandOptions,
+  getBrandSlug,
+  getCanonicalBrandName,
+  normalizeBrand,
+  PRODUCT_BRANDS,
+} from "@/lib/brand-data"
+import {
+  getProductCategoryFromSlug,
+  PRODUCT_CATEGORY_SLUGS,
+  productCategories,
+  type CatalogProduct,
+  type ProductCategoryName,
+} from "@/lib/product-data"
 
 const ALL_PRODUCTS = "All Products"
 const ALL_BRANDS = "All Brands"
 const PRODUCTS_PER_PAGE = 16
+type ProductSort = "brand-asc" | "brand-desc"
 
 const categoryIcons: Record<ProductCategoryName, LucideIcon> = {
   "Foot Protection": Footprints,
@@ -63,6 +82,12 @@ const categoryIcons: Record<ProductCategoryName, LucideIcon> = {
   "Technical Wear": BriefcaseBusiness,
   "Disposable Wear": Trash2,
   ESD: Shield,
+  "Traffic Safety": Cone,
+  Tools: Wrench,
+  Abrasives: Disc3,
+  "Chemicals and Lubricants": FlaskConical,
+  "Fire Safety": Flame,
+  "Medical and Emergency Equipment": HeartPulse,
   "W/ DOLE Certificate": BadgeCheck,
 }
 
@@ -155,19 +180,35 @@ export default function ProductsPage() {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [productSort, setProductSort] = useState<ProductSort>("brand-asc")
+  const [hasParsedQuery, setHasParsedQuery] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const category = params.get("category")
     const brand = params.get("brand")
+    const sort = params.get("sort")
 
-    if (category && productCategories.some((item) => item.name === category)) {
-      setSelectedCategory(category)
+    const resolvedCategory = category
+      ? productCategories.find((item) => item.name === category)?.name ?? getProductCategoryFromSlug(category)
+      : undefined
+
+    if (resolvedCategory) {
+      setSelectedCategory(resolvedCategory)
     }
 
     if (brand) {
-      setSelectedBrand(brand)
+      const knownBrand = PRODUCT_BRANDS.find(
+        (item) => normalizeBrand(item) === normalizeBrand(brand) || getBrandSlug(item) === brand,
+      )
+      setSelectedBrand(knownBrand ?? getCanonicalBrandName(brand))
     }
+
+    if (sort === "brand-desc" || sort === "brand-asc") {
+      setProductSort(sort)
+    }
+
+    setHasParsedQuery(true)
 
     fetch("/api/products", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : Promise.reject(new Error("Unable to load products."))))
@@ -180,36 +221,78 @@ export default function ProductsPage() {
     setCurrentPage(1)
   }, [selectedBrand, selectedCategory])
 
+  useEffect(() => {
+    if (!hasParsedQuery) {
+      return
+    }
+
+    const params = new URLSearchParams(window.location.search)
+    const category = productCategories.find((item) => item.name === selectedCategory)
+
+    if (category) {
+      params.set("category", PRODUCT_CATEGORY_SLUGS[category.name])
+    } else {
+      params.delete("category")
+    }
+
+    if (selectedBrand === ALL_BRANDS) {
+      params.delete("brand")
+    } else {
+      params.set("brand", getBrandSlug(selectedBrand))
+    }
+
+    params.set("sort", productSort)
+    window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`)
+  }, [hasParsedQuery, productSort, selectedBrand, selectedCategory])
+
   const activeCategory = useMemo(
     () => productCategories.find((category) => category.name === selectedCategory),
     [selectedCategory],
   )
 
   const brands = useMemo(() => {
-    const productBrandNames = new Set(products.map((product) => product.brand).filter(Boolean))
-
-    return productBrands
-      .map((brand) => brand.name)
-      .filter((brand) => productBrandNames.has(brand))
-      .concat(Array.from(productBrandNames).filter((brand) => !productBrands.some((item) => item.name === brand)))
+    return buildBrandOptions(products.map((product) => product.brand))
   }, [products])
 
-  const visibleBrands = useMemo(() => {
-    const query = brandSearchQuery.trim().toLowerCase()
+  useEffect(() => {
+    if (selectedBrand === ALL_BRANDS) {
+      return
+    }
 
-    return brands.filter((brand) => !query || brand.toLowerCase().includes(query)).slice(0, 5)
+    const resolvedBrand = brands.find(
+      (brand) =>
+        normalizeBrand(brand) === normalizeBrand(selectedBrand) ||
+        getBrandSlug(brand) === selectedBrand,
+    )
+
+    if (resolvedBrand && resolvedBrand !== selectedBrand) {
+      setSelectedBrand(resolvedBrand)
+    }
+  }, [brands, selectedBrand])
+
+  const visibleBrands = useMemo(() => {
+    const query = normalizeBrand(brandSearchQuery)
+
+    return [ALL_BRANDS, ...brands.filter((brand) => !query || normalizeBrand(brand).includes(query))]
   }, [brandSearchQuery, brands])
 
   const visibleProducts = useMemo(() => {
     const filteredProducts = products.filter((product) => {
       const matchesCategory = !activeCategory || product.category === activeCategory.name
-      const matchesBrand = selectedBrand === ALL_BRANDS || product.brand === selectedBrand
+      const matchesBrand =
+        selectedBrand === ALL_BRANDS ||
+        normalizeBrand(getCanonicalBrandName(product.brand)) === normalizeBrand(getCanonicalBrandName(selectedBrand))
 
       return matchesCategory && matchesBrand
     })
 
-    return [...filteredProducts].sort((a, b) => Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl)))
-  }, [activeCategory, products, selectedBrand])
+    return [...filteredProducts].sort((a, b) => {
+      const brandComparison = a.brand.localeCompare(b.brand, undefined, { sensitivity: "base" })
+      const orderedBrandComparison = productSort === "brand-desc" ? -brandComparison : brandComparison
+
+      return orderedBrandComparison || a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+    })
+  }, [activeCategory, productSort, products, selectedBrand])
 
   const categoryCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -327,9 +410,10 @@ export default function ProductsPage() {
                             {visibleBrands.map((brand) => (
                               <label key={brand} className="flex items-center gap-2 text-sm text-slate-600">
                                 <input
-                                  type="checkbox"
+                                  type="radio"
+                                  name="brand-filter"
                                   checked={selectedBrand === brand}
-                                  onChange={() => setSelectedBrand(selectedBrand === brand ? ALL_BRANDS : brand)}
+                                  onChange={() => setSelectedBrand(brand)}
                                   className="h-3.5 w-3.5 rounded border-slate-300 accent-orange-600"
                                 />
                                 {brand}
@@ -366,21 +450,33 @@ export default function ProductsPage() {
                       for protection.
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    className="h-12 border-primary px-6 text-primary hover:bg-primary hover:text-primary-foreground"
-                    asChild
-                  >
-                    <QuoteLink
-                      context={
-                        activeCategory
-                          ? { type: "category", value: activeCategory.name }
-                          : { type: "general", value: "PPE quote" }
-                      }
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <label className="sr-only" htmlFor="product-sort">Sort products</label>
+                    <select
+                      id="product-sort"
+                      value={productSort}
+                      onChange={(event) => setProductSort(event.target.value as ProductSort)}
+                      className="h-12 rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-[#0b2038]"
                     >
-                      Request Product Quote
-                    </QuoteLink>
-                  </Button>
+                      <option value="brand-asc">Brand: A to Z</option>
+                      <option value="brand-desc">Brand: Z to A</option>
+                    </select>
+                    <Button
+                      variant="outline"
+                      className="h-12 border-primary px-6 text-primary hover:bg-primary hover:text-primary-foreground"
+                      asChild
+                    >
+                      <QuoteLink
+                        context={
+                          activeCategory
+                            ? { type: "category", value: activeCategory.name }
+                            : { type: "general", value: "PPE quote" }
+                        }
+                      >
+                        Request Product Quote
+                      </QuoteLink>
+                    </Button>
+                  </div>
                 </div>
 
                 {isLoading ? (
@@ -406,6 +502,10 @@ export default function ProductsPage() {
                               <img
                                 src={product.imageUrl}
                                 alt={product.name}
+                                onError={(event) => {
+                                  event.currentTarget.onerror = null
+                                  event.currentTarget.src = "/placeholder.jpg"
+                                }}
                                 className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
                               />
                             ) : (
@@ -523,7 +623,15 @@ export default function ProductsPage() {
                           }`}
                         >
                           {selectedProduct.imageUrl ? (
-                            <img src={selectedProduct.imageUrl} alt="" className="h-full w-full object-contain" />
+                            <img
+                              src={selectedProduct.imageUrl}
+                              alt=""
+                              className="h-full w-full object-contain"
+                              onError={(event) => {
+                                event.currentTarget.onerror = null
+                                event.currentTarget.src = "/placeholder.jpg"
+                              }}
+                            />
                           ) : (
                             <DetailIcon className="h-8 w-8 text-slate-400" />
                           )}
@@ -556,6 +664,10 @@ export default function ProductsPage() {
                             <img
                               src={selectedProduct.imageUrl}
                               alt={selectedProduct.name}
+                              onError={(event) => {
+                                event.currentTarget.onerror = null
+                                event.currentTarget.src = "/placeholder.jpg"
+                              }}
                               className="h-full w-full object-contain drop-shadow-sm"
                             />
                           ) : (

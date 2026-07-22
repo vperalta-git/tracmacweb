@@ -1,4 +1,5 @@
-import { productCategories, type CatalogProduct, type ProductCategoryName } from "@/lib/product-data"
+import { isProductCategory, type CatalogProduct } from "@/lib/product-data"
+import { getBrandByName, getCanonicalBrandName } from "@/lib/brand-data"
 
 const PRODUCTS_STORAGE_KEY = "tracmac.catalog.products.v1"
 const MAX_IMAGE_BYTES = 750 * 1024
@@ -44,10 +45,6 @@ function writeStoredProducts(products: CatalogProduct[]) {
   }
 }
 
-function isValidCategory(category: string): category is ProductCategoryName {
-  return productCategories.some((item) => item.name === category)
-}
-
 function readTextValue(formData: FormData, key: string) {
   const value = formData.get(key)
 
@@ -57,7 +54,9 @@ function readTextValue(formData: FormData, key: string) {
 function readProductPayload(formData: FormData) {
   const name = readTextValue(formData, "name")
   const category = readTextValue(formData, "category")
-  const brand = readTextValue(formData, "brand")
+  const selectedBrand = readTextValue(formData, "brand")
+  const customBrand = readTextValue(formData, "customBrand")
+  const brand = selectedBrand === "Other" ? customBrand : getCanonicalBrandName(selectedBrand)
   const description = readTextValue(formData, "description")
   const spec = readTextValue(formData, "spec")
   const badge = readTextValue(formData, "badge")
@@ -66,8 +65,16 @@ function readProductPayload(formData: FormData) {
     throw new Error("Name, brand, category, description, and specs are required.")
   }
 
-  if (!isValidCategory(category)) {
+  if (!isProductCategory(category)) {
     throw new Error("Please choose a valid product category.")
+  }
+
+  if (selectedBrand !== "Other" && !getBrandByName(selectedBrand)) {
+    throw new Error("Please choose a supported brand.")
+  }
+
+  if (selectedBrand === "Other" && getBrandByName(customBrand)) {
+    throw new Error(`“${getCanonicalBrandName(customBrand)}” already exists. Choose it from the brand list.`)
   }
 
   return {

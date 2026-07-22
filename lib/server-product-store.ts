@@ -1,8 +1,9 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises"
 import path from "node:path"
-import { getBrandByName } from "@/lib/brand-data"
+import { ObjectId } from "mongodb"
+import { getBrandByName, getCanonicalBrandName, normalizeBrand } from "@/lib/brand-data"
 import { getMongoDb } from "@/lib/mongodb"
-import { demoProducts, productCategories, type CatalogProduct, type ProductCategoryName } from "@/lib/product-data"
+import { demoProducts, isProductCategory, type CatalogProduct } from "@/lib/product-data"
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "products")
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -14,11 +15,8 @@ const allowedImageTypes = new Map([
   ["image/gif", "gif"],
 ])
 
-type StoredProduct = Omit<CatalogProduct, "isDemo">
-
-function isValidCategory(category: string): category is ProductCategoryName {
-  return productCategories.some((item) => item.name === category)
-}
+type StoredProduct = Omit<CatalogProduct, "_id" | "isDemo">
+type NormalizableProduct = Omit<Partial<CatalogProduct>, "_id"> & { _id?: ObjectId | string }
 
 function cleanText(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : ""
@@ -28,11 +26,7 @@ function cleanBrand(value: string) {
   return value.replace(/\s+/g, " ").trim()
 }
 
-function isValidBrand(brand: string) {
-  return Boolean(getBrandByName(brand))
-}
-
-function normalizeProduct(product: Partial<CatalogProduct> | null): CatalogProduct | null {
+function normalizeProduct(product: NormalizableProduct | null): CatalogProduct | null {
   if (!product) {
     return null
   }
@@ -49,15 +43,16 @@ function normalizeProduct(product: Partial<CatalogProduct> | null): CatalogProdu
     return null
   }
 
-  if (!isValidCategory(product.category)) {
+  if (!isProductCategory(product.category)) {
     return null
   }
 
   return {
+    _id: product._id?.toString(),
     id: product.id,
     name: product.name,
     category: product.category,
-    brand: getBrandByName(cleanBrand(product.brand ?? ""))?.name ?? "TRACMAC",
+    brand: getCanonicalBrandName(cleanBrand(product.brand ?? "")) || "Unbranded",
     description: product.description,
     spec,
     badge: product.badge || undefined,
@@ -82,7 +77,7 @@ export async function getProducts() {
   try {
     const collection = await productsCollection()
     const storedProducts = (await collection.find({}).sort({ createdAt: -1 }).toArray())
-      .map((item) => normalizeProduct(item as Partial<CatalogProduct>))
+      .map((item) => normalizeProduct(item))
       .filter((item): item is CatalogProduct => Boolean(item))
     const storedIds = new Set(storedProducts.map((product) => product.id))
 
@@ -99,7 +94,10 @@ export async function getProducts() {
 function readProductPayload(formData: FormData) {
   const name = cleanText(formData.get("name"))
   const category = cleanText(formData.get("category"))
-  const brand = cleanBrand(cleanText(formData.get("brand")))
+  const selectedBrand = cleanBrand(cleanText(formData.get("brand")))
+  const customBrand = cleanBrand(cleanText(formData.get("customBrand")))
+  const isCustomBrand = selectedBrand === "Other"
+  const brand = isCustomBrand ? customBrand : getCanonicalBrandName(selectedBrand)
   const description = cleanText(formData.get("description"))
   const spec = cleanText(formData.get("spec")) || cleanText(formData.get("specs"))
   const badge = cleanText(formData.get("badge"))
@@ -108,21 +106,39 @@ function readProductPayload(formData: FormData) {
     throw new Error("Name, brand, category, description, and specs are required.")
   }
 
-  if (!isValidCategory(category)) {
+  if (!isProductCategory(category)) {
     throw new Error("Please choose a valid product category.")
   }
 
-  if (!isValidBrand(brand)) {
+  if (!isCustomBrand && !getBrandByName(selectedBrand)) {
     throw new Error("Please choose a supported brand.")
+  }
+
+  if (isCustomBrand && !customBrand) {
+    throw new Error("Please enter a custom brand name.")
+  }
+
+  if (isCustomBrand && getBrandByName(customBrand)) {
+    throw new Error(`“${getCanonicalBrandName(customBrand)}” already exists. Choose it from the brand list.`)
   }
 
   return {
     name,
     category,
-    brand: getBrandByName(brand)?.name ?? brand,
+    brand: isCustomBrand ? brand : getCanonicalBrandName(brand),
     description,
     spec,
     badge: badge || undefined,
+    isCustomBrand,
+  }
+}
+
+async function ensureCustomBrandIsUnique(brand: string, excludedId?: string) {
+  const collection = await productsCollection()
+  const existingBrands = await collection.find(excludedId ? { id: { $ne: excludedId } } : {}, { projection: { brand: 1 } }).toArray()
+
+  if (existingBrands.some((product) => normalizeBrand(product.brand ?? "") === normalizeBrand(brand))) {
+    throw new Error(`“${brand}” already exists. Use the existing capitalization.`)
   }
 }
 
@@ -168,7 +184,10 @@ async function deleteUploadedImage(imageUrl?: string) {
 }
 
 export async function addProduct(formData: FormData) {
-  const payload = readProductPayload(formData)
+  const { isCustomBrand, ...payload } = readProductPayload(formData)
+  if (isCustomBrand) {
+    await ensureCustomBrandIsUnique(payload.brand)
+  }
   const image = formData.get("image")
   const imageUrl = image instanceof File ? await saveProductImage(image) : undefined
   const product: CatalogProduct = {
@@ -179,13 +198,22 @@ export async function addProduct(formData: FormData) {
   }
   const collection = await productsCollection()
 
-  await collection.insertOne(product)
+  const { _id: _databaseId, ...storedProduct } = product
+  await collection.insertOne(storedProduct)
 
   return product
 }
 
-export async function updateProduct(id: string, formData: FormData) {
-  if (!id) {
+function productFilter(id: string, databaseId?: string) {
+  if (databaseId && ObjectId.isValid(databaseId)) {
+    return { _id: new ObjectId(databaseId) }
+  }
+
+  return { id }
+}
+
+export async function updateProduct(id: string, formData: FormData, databaseId?: string) {
+  if (!id && !databaseId) {
     throw new Error("Product ID is required.")
   }
 
@@ -193,10 +221,14 @@ export async function updateProduct(id: string, formData: FormData) {
     throw new Error("Demo products cannot be edited. Add a new product to replace it.")
   }
 
-  const payload = readProductPayload(formData)
+  const { isCustomBrand, ...payload } = readProductPayload(formData)
+  if (isCustomBrand) {
+    await ensureCustomBrandIsUnique(payload.brand, id)
+  }
   const image = formData.get("image")
   const collection = await productsCollection()
-  const existingProduct = normalizeProduct((await collection.findOne({ id })) as Partial<CatalogProduct> | null)
+  const filter = productFilter(id, databaseId)
+  const existingProduct = normalizeProduct(await collection.findOne(filter))
 
   if (!existingProduct) {
     throw new Error("Product not found.")
@@ -210,7 +242,8 @@ export async function updateProduct(id: string, formData: FormData) {
     updatedAt: new Date().toISOString(),
   }
 
-  await collection.updateOne({ id }, { $set: product })
+  const { _id: _databaseId, ...productUpdate } = product
+  await collection.updateOne(filter, { $set: productUpdate })
 
   if (imageUrl && imageUrl !== existingProduct.imageUrl) {
     await deleteUploadedImage(existingProduct.imageUrl)
@@ -219,8 +252,8 @@ export async function updateProduct(id: string, formData: FormData) {
   return product
 }
 
-export async function deleteProduct(id: string) {
-  if (!id) {
+export async function deleteProduct(id: string, databaseId?: string) {
+  if (!id && !databaseId) {
     throw new Error("Product ID is required.")
   }
 
@@ -229,12 +262,13 @@ export async function deleteProduct(id: string) {
   }
 
   const collection = await productsCollection()
-  const productToDelete = normalizeProduct((await collection.findOne({ id })) as Partial<CatalogProduct> | null)
+  const filter = productFilter(id, databaseId)
+  const productToDelete = normalizeProduct(await collection.findOne(filter))
 
   if (!productToDelete) {
     throw new Error("Product not found.")
   }
 
-  await collection.deleteOne({ id })
+  await collection.deleteOne(filter)
   await deleteUploadedImage(productToDelete.imageUrl)
 }

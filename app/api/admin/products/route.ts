@@ -53,7 +53,12 @@ export async function PATCH(request: Request) {
   try {
     const formData = await request.formData()
     const id = formData.get("id")
-    const product = await updateProduct(typeof id === "string" ? id : "", formData)
+    const databaseId = formData.get("_id")
+    const product = await updateProduct(
+      typeof id === "string" ? id : "",
+      formData,
+      typeof databaseId === "string" ? databaseId : undefined,
+    )
 
     return NextResponse.json({ product })
   } catch (error) {
@@ -70,9 +75,9 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const { id } = (await request.json()) as { id?: string }
+    const { id, _id } = (await request.json()) as { id?: string; _id?: string }
 
-    await deleteProduct(id ?? "")
+    await deleteProduct(id ?? "", _id)
 
     return NextResponse.json({ ok: true })
   } catch (error) {

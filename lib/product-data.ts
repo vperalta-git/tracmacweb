@@ -1,17 +1,57 @@
-export type ProductCategoryName =
-  | "Foot Protection"
-  | "Head Protection"
-  | "Fall Protection"
-  | "Eye and Face Protection"
-  | "Hearing Protection"
-  | "Respiratory Protection"
-  | "Hand Protection"
-  | "Workwear"
-  | "Outdoor Wear"
-  | "Technical Wear"
-  | "Disposable Wear"
-  | "ESD"
-  | "W/ DOLE Certificate"
+export const PRODUCT_CATEGORIES = [
+  "Foot Protection",
+  "Head Protection",
+  "Fall Protection",
+  "Eye and Face Protection",
+  "Hearing Protection",
+  "Respiratory Protection",
+  "Hand Protection",
+  "Workwear",
+  "Outdoor Wear",
+  "Technical Wear",
+  "Disposable Wear",
+  "ESD",
+  "Traffic Safety",
+  "Tools",
+  "Abrasives",
+  "Chemicals and Lubricants",
+  "Fire Safety",
+  "Medical and Emergency Equipment",
+  // Retained for products already using the site's legacy compliance category.
+  "W/ DOLE Certificate",
+] as const
+
+export type ProductCategoryName = (typeof PRODUCT_CATEGORIES)[number]
+
+export const PRODUCT_CATEGORY_SLUGS: Record<ProductCategoryName, string> = {
+  "Foot Protection": "foot-protection",
+  "Head Protection": "head-protection",
+  "Fall Protection": "fall-protection",
+  "Eye and Face Protection": "eye-and-face-protection",
+  "Hearing Protection": "hearing-protection",
+  "Respiratory Protection": "respiratory-protection",
+  "Hand Protection": "hand-protection",
+  Workwear: "workwear",
+  "Outdoor Wear": "outdoor-wear",
+  "Technical Wear": "technical-wear",
+  "Disposable Wear": "disposable-wear",
+  ESD: "esd",
+  "Traffic Safety": "traffic-safety",
+  Tools: "tools",
+  Abrasives: "abrasives",
+  "Chemicals and Lubricants": "chemicals-and-lubricants",
+  "Fire Safety": "fire-safety",
+  "Medical and Emergency Equipment": "medical-and-emergency-equipment",
+  "W/ DOLE Certificate": "w-dole-certificate",
+}
+
+export function isProductCategory(value: string): value is ProductCategoryName {
+  return (PRODUCT_CATEGORIES as readonly string[]).includes(value)
+}
+
+export function getProductCategoryFromSlug(slug: string) {
+  return PRODUCT_CATEGORIES.find((category) => PRODUCT_CATEGORY_SLUGS[category] === slug)
+}
 
 export type ProductCategory = {
   name: ProductCategoryName
@@ -19,13 +59,14 @@ export type ProductCategory = {
 }
 
 export type CatalogProduct = {
+  _id?: string
   id: string
   name: string
   category: ProductCategoryName
   brand: string
   description: string
   spec: string
-  badge?: string
+  badge?: string | null
   imageUrl?: string
   createdAt?: string
   updatedAt?: string
@@ -80,6 +121,30 @@ export const productCategories: ProductCategory[] = [
   {
     name: "ESD",
     description: "Static-control equipment for electronics, assembly, and sensitive production floors.",
+  },
+  {
+    name: "Traffic Safety",
+    description: "Cones, batons, barricade tape, visibility whips, and roadside warning equipment.",
+  },
+  {
+    name: "Tools",
+    description: "Drill bits, blades, rollers, welding holders, and general workshop tools.",
+  },
+  {
+    name: "Abrasives",
+    description: "Grinding and cutting wheels, sandpaper, sanding discs, and polishing discs.",
+  },
+  {
+    name: "Chemicals and Lubricants",
+    description: "Cleaners, degreasers, spray paint, lubricants, silicone sprays, and greases.",
+  },
+  {
+    name: "Fire Safety",
+    description: "Fire blankets, welding blankets, and fire-suppression accessories.",
+  },
+  {
+    name: "Medical and Emergency Equipment",
+    description: "AED units, electrodes, batteries, defibrillators, and emergency training kits.",
   },
   {
     name: "W/ DOLE Certificate",
