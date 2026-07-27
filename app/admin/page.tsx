@@ -45,13 +45,15 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
   buildBrandOptions,
+  getCanonicalBrandName,
   getBrandByName,
   getBrandSlug,
   normalizeBrand,
   productBrands,
 } from "@/lib/brand-data"
-import { productCategories } from "@/lib/product-data"
+import { LEGACY_DOLE_CATEGORY, productCategories } from "@/lib/product-data"
 import type { CatalogProduct } from "@/lib/product-data"
+import { getProductImageUrl, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/product-image"
 
 const adminNavItems = [
   { label: "Dashboard", icon: Home },
@@ -146,7 +148,9 @@ export default function AdminPage() {
   const brandSummaries = adminBrandOptions.map((name) => ({
     name,
     slug: getBrandSlug(name),
-    count: products.filter((product) => normalizeBrand(product.brand) === normalizeBrand(name)).length,
+    count: products.filter(
+      (product) => normalizeBrand(getCanonicalBrandName(product.brand)) === normalizeBrand(getCanonicalBrandName(name)),
+    ).length,
   }))
 
   const adminSectionCopy: Record<AdminSection, { title: string; description: string }> = {
@@ -750,6 +754,12 @@ export default function AdminPage() {
                                 {category.name}
                               </option>
                             ))}
+                            {editingProduct && !productCategories.some(({ name }) => name === editingProduct.category) && (
+                              <option value={editingProduct.category} disabled>
+                                {editingProduct.category}
+                                {editingProduct.category === LEGACY_DOLE_CATEGORY ? " (legacy certification value)" : " (stored value)"}
+                              </option>
+                            )}
                           </select>
                         </div>
                         <div className="space-y-2">
@@ -794,7 +804,7 @@ export default function AdminPage() {
 
                       <div className="space-y-2">
                         <Label htmlFor="image" className="text-xs font-extrabold text-[#0f2435]">
-                          Product Image <span className="text-primary">*</span>
+                          Product Image <span className="font-normal text-muted-foreground">(optional)</span>
                         </Label>
                         {previewUrl && selectedImageFile ? (
                           <div className="rounded-lg border border-[#d6dee8] bg-white p-4">
@@ -952,11 +962,11 @@ export default function AdminPage() {
                             <div className="flex h-32 items-center justify-center overflow-hidden rounded-md bg-[#eef3f7] p-3">
                               {product.imageUrl ? (
                                 <Image
-                                  src={product.imageUrl}
+                                  src={getProductImageUrl(product.imageUrl)}
                                   alt={product.name}
                                   onError={(event) => {
                                     event.currentTarget.onerror = null
-                                    event.currentTarget.src = "/placeholder.jpg"
+                                    event.currentTarget.src = PRODUCT_IMAGE_PLACEHOLDER
                                   }}
                                   width={142}
                                   height={128}
@@ -976,7 +986,9 @@ export default function AdminPage() {
                               <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#33485f]">{product.description}</p>
                               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-[#53677a]">
                                 <span>{product.category}</span>
-                                {product.badge && <span className="rounded bg-[#eef3f7] px-2 py-0.5">{product.badge}</span>}
+                                {product.badge?.trim() && (
+                                  <span className="rounded bg-[#eef3f7] px-2 py-0.5">{product.badge.trim()}</span>
+                                )}
                                 {product.isDemo && <span>Demo item</span>}
                               </div>
                               <p className="mt-2 truncate text-xs font-semibold text-[#53677a]">Specs: {product.spec}</p>

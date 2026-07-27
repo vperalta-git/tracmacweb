@@ -17,11 +17,12 @@ export const PRODUCT_CATEGORIES = [
   "Chemicals and Lubricants",
   "Fire Safety",
   "Medical and Emergency Equipment",
-  // Retained for products already using the site's legacy compliance category.
-  "W/ DOLE Certificate",
+  "Cleaning and Janitorial",
 ] as const
 
 export type ProductCategoryName = (typeof PRODUCT_CATEGORIES)[number]
+export const LEGACY_DOLE_CATEGORY = "W/ DOLE Certificate" as const
+export type StoredProductCategory = ProductCategoryName | typeof LEGACY_DOLE_CATEGORY
 
 export const PRODUCT_CATEGORY_SLUGS: Record<ProductCategoryName, string> = {
   "Foot Protection": "foot-protection",
@@ -42,7 +43,7 @@ export const PRODUCT_CATEGORY_SLUGS: Record<ProductCategoryName, string> = {
   "Chemicals and Lubricants": "chemicals-and-lubricants",
   "Fire Safety": "fire-safety",
   "Medical and Emergency Equipment": "medical-and-emergency-equipment",
-  "W/ DOLE Certificate": "w-dole-certificate",
+  "Cleaning and Janitorial": "cleaning-and-janitorial",
 }
 
 export function isProductCategory(value: string): value is ProductCategoryName {
@@ -62,12 +63,15 @@ export type CatalogProduct = {
   _id?: string
   id: string
   name: string
-  category: ProductCategoryName
+  // Reads preserve MongoDB category values; admin writes are validated against ProductCategoryName.
+  category: string
   brand: string
   description: string
   spec: string
   badge?: string | null
-  imageUrl?: string
+  imageUrl?: string | null
+  doleCertificate?: boolean | null
+  certification?: string | null
   createdAt?: string
   updatedAt?: string
   isDemo?: boolean
@@ -147,10 +151,20 @@ export const productCategories: ProductCategory[] = [
     description: "AED units, electrodes, batteries, defibrillators, and emergency training kits.",
   },
   {
-    name: "W/ DOLE Certificate",
-    description: "Certified PPE and documentation-ready items for compliance-focused procurement.",
+    name: "Cleaning and Janitorial",
+    description: "Cleaning, floor-care, waste-management, and janitorial equipment for workplaces and facilities.",
   },
 ]
+
+export function hasDoleCertificate(product: CatalogProduct) {
+  if (product.doleCertificate === true || product.category === LEGACY_DOLE_CATEGORY) {
+    return true
+  }
+
+  return [product.certification, product.badge].some(
+    (value) => typeof value === "string" && /\bdole\b/i.test(value.trim()),
+  )
+}
 
 export const demoProducts: CatalogProduct[] = [
   {

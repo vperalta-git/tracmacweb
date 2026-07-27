@@ -10,6 +10,13 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: [
+      { protocol: "https", hostname: "wintesscommercial.com" },
+      { protocol: "https", hostname: "www.wintesscommercial.com" },
+      { protocol: "https", hostname: "static.wixstatic.com" },
+      { protocol: "https", hostname: "chemluxinc.com" },
+      { protocol: "https", hostname: "www.chemluxinc.com" },
+    ],
   },
 }
 

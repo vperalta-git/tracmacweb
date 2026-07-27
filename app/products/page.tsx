@@ -26,6 +26,7 @@ import {
   Mountain,
   PackageOpen,
   Search,
+  Sparkles,
   Shield,
   Shirt,
   SlidersHorizontal,
@@ -58,18 +59,22 @@ import {
 } from "@/lib/brand-data"
 import {
   getProductCategoryFromSlug,
+  hasDoleCertificate,
+  LEGACY_DOLE_CATEGORY,
   PRODUCT_CATEGORY_SLUGS,
   productCategories,
   type CatalogProduct,
   type ProductCategoryName,
+  type StoredProductCategory,
 } from "@/lib/product-data"
+import { getProductImageUrl, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/product-image"
 
 const ALL_PRODUCTS = "All Products"
 const ALL_BRANDS = "All Brands"
 const PRODUCTS_PER_PAGE = 16
-type ProductSort = "brand-asc" | "brand-desc"
+type ProductSort = "name-asc" | "name-desc" | "brand-asc" | "brand-desc"
 
-const categoryIcons: Record<ProductCategoryName, LucideIcon> = {
+const categoryIcons: Record<StoredProductCategory, LucideIcon> = {
   "Foot Protection": Footprints,
   "Head Protection": HardHat,
   "Fall Protection": Anchor,
@@ -88,15 +93,15 @@ const categoryIcons: Record<ProductCategoryName, LucideIcon> = {
   "Chemicals and Lubricants": FlaskConical,
   "Fire Safety": Flame,
   "Medical and Emergency Equipment": HeartPulse,
-  "W/ DOLE Certificate": BadgeCheck,
+  "Cleaning and Janitorial": Sparkles,
+  [LEGACY_DOLE_CATEGORY]: Shield,
 }
 
-const certificationOptions = ["CE Certified", "ANSI Approved", "EN Standard", "DOLE Certified"]
 const filterGroups = ["Brand", "Product Type", "Certifications", "Industry", "Material", "Color"]
 const featureChipIcons = [Wind, Feather, Shield, SlidersHorizontal]
 
 function getProductFeatureChips(product: CatalogProduct) {
-  const categoryFeatureMap: Partial<Record<ProductCategoryName, string[]>> = {
+  const categoryFeatureMap: Partial<Record<StoredProductCategory, string[]>> = {
     "Head Protection": ["Breathable", "Lightweight", "Impact Resistant", "Adjustable Fit"],
     "Foot Protection": ["Slip Resistant", "Durable Build", "Toe Protection", "Worksite Ready"],
     "Fall Protection": ["Anchorage Ready", "Secure Fit", "Load Rated", "Height Safety"],
@@ -108,7 +113,7 @@ function getProductFeatureChips(product: CatalogProduct) {
     "Outdoor Wear": ["Weather Ready", "Lightweight", "Waterproof", "Field Tested"],
   }
 
-  return categoryFeatureMap[product.category] ?? ["Certified", "Durable", "Comfort Fit", "Industrial Use"]
+  return categoryFeatureMap[product.category as StoredProductCategory] ?? ["Certified", "Durable", "Comfort Fit", "Industrial Use"]
 }
 
 function getProductFeatures(product: CatalogProduct) {
@@ -135,7 +140,7 @@ function getSpecRows(product: CatalogProduct) {
     ["Use Case", "Industrial PPE"],
     ["Availability", "Quote upon request"],
     ["Support", "Catalog-ready assistance"],
-    ["Certification", product.category === "W/ DOLE Certificate" ? "DOLE documentation" : "Upon request"],
+    ["Certification", hasDoleCertificate(product) ? "DOLE documentation" : "Upon request"],
   ]
 
   if (!specParts.length) {
@@ -175,6 +180,8 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState(ALL_PRODUCTS)
   const [selectedBrand, setSelectedBrand] = useState(ALL_BRANDS)
   const [brandSearchQuery, setBrandSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [withDoleCertificate, setWithDoleCertificate] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [products, setProducts] = useState<CatalogProduct[]>([])
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
@@ -188,6 +195,8 @@ export default function ProductsPage() {
     const category = params.get("category")
     const brand = params.get("brand")
     const sort = params.get("sort")
+    const search = params.get("q")
+    const dole = params.get("dole")
 
     const resolvedCategory = category
       ? productCategories.find((item) => item.name === category)?.name ?? getProductCategoryFromSlug(category)
@@ -204,9 +213,11 @@ export default function ProductsPage() {
       setSelectedBrand(knownBrand ?? getCanonicalBrandName(brand))
     }
 
-    if (sort === "brand-desc" || sort === "brand-asc") {
+    if (sort === "brand-desc" || sort === "brand-asc" || sort === "name-desc" || sort === "name-asc") {
       setProductSort(sort)
     }
+    setSearchQuery(search ?? "")
+    setWithDoleCertificate(dole === "1")
 
     setHasParsedQuery(true)
 
@@ -219,7 +230,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [selectedBrand, selectedCategory])
+  }, [searchQuery, selectedBrand, selectedCategory, withDoleCertificate])
 
   useEffect(() => {
     if (!hasParsedQuery) {
@@ -242,8 +253,12 @@ export default function ProductsPage() {
     }
 
     params.set("sort", productSort)
+    if (searchQuery.trim()) params.set("q", searchQuery.trim())
+    else params.delete("q")
+    if (withDoleCertificate) params.set("dole", "1")
+    else params.delete("dole")
     window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`)
-  }, [hasParsedQuery, productSort, selectedBrand, selectedCategory])
+  }, [hasParsedQuery, productSort, searchQuery, selectedBrand, selectedCategory, withDoleCertificate])
 
   const activeCategory = useMemo(
     () => productCategories.find((category) => category.name === selectedCategory),
@@ -277,22 +292,33 @@ export default function ProductsPage() {
   }, [brandSearchQuery, brands])
 
   const visibleProducts = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase()
     const filteredProducts = products.filter((product) => {
       const matchesCategory = !activeCategory || product.category === activeCategory.name
       const matchesBrand =
         selectedBrand === ALL_BRANDS ||
         normalizeBrand(getCanonicalBrandName(product.brand)) === normalizeBrand(getCanonicalBrandName(selectedBrand))
+      const matchesSearch =
+        !query ||
+        [product.name, product.brand, product.category, product.description, product.spec, product.badge]
+          .filter((value): value is string => typeof value === "string")
+          .some((value) => value.toLocaleLowerCase().includes(query))
+      const matchesCertification = !withDoleCertificate || hasDoleCertificate(product)
 
-      return matchesCategory && matchesBrand
+      return matchesCategory && matchesBrand && matchesSearch && matchesCertification
     })
 
     return [...filteredProducts].sort((a, b) => {
+      const nameComparison = a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+      if (productSort === "name-asc") return nameComparison
+      if (productSort === "name-desc") return -nameComparison
+
       const brandComparison = a.brand.localeCompare(b.brand, undefined, { sensitivity: "base" })
       const orderedBrandComparison = productSort === "brand-desc" ? -brandComparison : brandComparison
 
-      return orderedBrandComparison || a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+      return orderedBrandComparison || nameComparison
     })
-  }, [activeCategory, productSort, products, selectedBrand])
+  }, [activeCategory, productSort, products, searchQuery, selectedBrand, withDoleCertificate])
 
   const categoryCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -315,7 +341,9 @@ export default function ProductsPage() {
   )
 
   const categoryOptions = [{ name: ALL_PRODUCTS, description: "View every available product" }, ...productCategories]
-  const DetailIcon = selectedProduct ? categoryIcons[selectedProduct.category] : PackageOpen
+  const DetailIcon = selectedProduct
+    ? categoryIcons[selectedProduct.category as StoredProductCategory] ?? PackageOpen
+    : PackageOpen
 
   function openProduct(productId: string) {
     setSelectedProductId(productId)
@@ -343,7 +371,7 @@ export default function ProductsPage() {
                     <p className="text-sm font-bold uppercase tracking-[0.08em]">Product Categories</p>
                     <ChevronDown className="ml-auto h-4 w-4 rotate-180 text-white/75" />
                   </div>
-                  <div className="py-1.5">
+                  <div className="max-h-[60vh] overflow-y-auto py-1.5 pr-1 lg:max-h-[calc(100vh-11rem)]">
                     {categoryOptions.map((category) => {
                       const isActive = selectedCategory === category.name
                       const CategoryIcon = category.name === ALL_PRODUCTS ? Grid2X2 : categoryIcons[category.name as ProductCategoryName]
@@ -353,13 +381,14 @@ export default function ProductsPage() {
                         <button
                           key={category.name}
                           type="button"
+                          title={category.name}
                           onClick={() => setSelectedCategory(category.name)}
                           className={`flex w-full items-center gap-3 px-5 py-2.5 text-left text-sm font-medium transition ${
                             isActive ? "bg-orange-50 text-primary" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
                           }`}
                         >
                           {CategoryIcon && <CategoryIcon className="h-4 w-4 shrink-0" />}
-                          <span className="min-w-0 flex-1 truncate">{category.name}</span>
+                          <span className="min-w-0 flex-1 break-words pr-1">{category.name}</span>
                           <span
                             className={`rounded-md px-2 py-0.5 text-xs font-bold ${
                               isActive ? "bg-white text-primary" : "bg-slate-100 text-slate-500"
@@ -381,6 +410,7 @@ export default function ProductsPage() {
                       onClick={() => {
                         setSelectedBrand(ALL_BRANDS)
                         setBrandSearchQuery("")
+                        setWithDoleCertificate(false)
                       }}
                       className="text-xs font-bold text-primary hover:text-orange-700"
                     >
@@ -425,12 +455,15 @@ export default function ProductsPage() {
 
                       {group === "Certifications" && (
                         <div className="space-y-2.5 px-4 pb-4">
-                          {certificationOptions.map((certification) => (
-                            <label key={certification} className="flex items-center gap-2 text-sm text-slate-600">
-                              <input type="checkbox" className="h-3.5 w-3.5 rounded border-slate-300 accent-orange-600" />
-                              {certification}
-                            </label>
-                          ))}
+                          <label className="flex items-center gap-2 text-sm text-slate-600">
+                            <input
+                              type="checkbox"
+                              checked={withDoleCertificate}
+                              onChange={(event) => setWithDoleCertificate(event.target.checked)}
+                              className="h-3.5 w-3.5 rounded border-slate-300 accent-orange-600"
+                            />
+                            With DOLE Certificate
+                          </label>
                         </div>
                       )}
                     </div>
@@ -451,6 +484,16 @@ export default function ProductsPage() {
                     </p>
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row">
+                    <label className="relative block min-w-64">
+                      <span className="sr-only">Search products</span>
+                      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <Input
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder="Search products..."
+                        className="h-12 border-slate-300 bg-white pl-9"
+                      />
+                    </label>
                     <label className="sr-only" htmlFor="product-sort">Sort products</label>
                     <select
                       id="product-sort"
@@ -458,6 +501,8 @@ export default function ProductsPage() {
                       onChange={(event) => setProductSort(event.target.value as ProductSort)}
                       className="h-12 rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-[#0b2038]"
                     >
+                      <option value="name-asc">Name: A to Z</option>
+                      <option value="name-desc">Name: Z to A</option>
                       <option value="brand-asc">Brand: A to Z</option>
                       <option value="brand-desc">Brand: Z to A</option>
                     </select>
@@ -486,7 +531,6 @@ export default function ProductsPage() {
                 ) : pageProducts.length ? (
                   <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
                     {pageProducts.map((product) => {
-                      const ProductIcon = categoryIcons[product.category]
                       const specTags = getSpecTags(product)
 
                       return (
@@ -498,27 +542,25 @@ export default function ProductsPage() {
                           <div className="relative flex h-56 min-h-[220px] items-center justify-center overflow-hidden bg-gradient-to-br from-[#eef3f7] via-[#f2f5f8] to-[#dfe7ee] p-7">
                             <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#0f2435]/10 to-transparent" />
                             <BrandMark brand={product.brand} badge className="absolute right-4 top-4 z-20" />
-                            {product.imageUrl ? (
-                              <img
-                                src={product.imageUrl}
+                            <img
+                                src={getProductImageUrl(product.imageUrl)}
                                 alt={product.name}
                                 onError={(event) => {
                                   event.currentTarget.onerror = null
-                                  event.currentTarget.src = "/placeholder.jpg"
+                                  event.currentTarget.src = PRODUCT_IMAGE_PLACEHOLDER
                                 }}
                                 className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
                               />
-                            ) : (
-                              <div className="flex h-40 w-40 flex-col items-center justify-center rounded-lg bg-white/80 text-center text-slate-500 shadow-inner">
-                                <ProductIcon className="h-11 w-11 text-slate-400" />
-                                <p className="mt-5 text-sm leading-5">Product image coming soon</p>
-                              </div>
-                            )}
                           </div>
 
                           <div className="flex flex-1 flex-col p-5">
                             <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#53677a]">{product.brand}</p>
                             <p className="mt-2 text-xs font-bold text-[#53677a]">{product.category}</p>
+                            {product.badge?.trim() && (
+                              <Badge className="mt-2 w-fit bg-orange-50 text-primary hover:bg-orange-50">
+                                {product.badge.trim()}
+                              </Badge>
+                            )}
                             <h2 className="mt-3 line-clamp-2 text-xl font-bold leading-snug text-[#0b2038]">{product.name}</h2>
                             <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{product.description}</p>
                             <div className="mt-4 flex flex-wrap gap-2">

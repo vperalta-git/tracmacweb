@@ -3,7 +3,11 @@ import path from "node:path"
 import { ObjectId } from "mongodb"
 import { getBrandByName, getCanonicalBrandName, normalizeBrand } from "@/lib/brand-data"
 import { getMongoDb } from "@/lib/mongodb"
-import { demoProducts, isProductCategory, type CatalogProduct } from "@/lib/product-data"
+import {
+  demoProducts,
+  isProductCategory,
+  type CatalogProduct,
+} from "@/lib/product-data"
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "products")
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -43,10 +47,6 @@ function normalizeProduct(product: NormalizableProduct | null): CatalogProduct |
     return null
   }
 
-  if (!isProductCategory(product.category)) {
-    return null
-  }
-
   return {
     _id: product._id?.toString(),
     id: product.id,
@@ -55,10 +55,12 @@ function normalizeProduct(product: NormalizableProduct | null): CatalogProduct |
     brand: getCanonicalBrandName(cleanBrand(product.brand ?? "")) || "Unbranded",
     description: product.description,
     spec,
-    badge: product.badge || undefined,
-    imageUrl: imageUrl || undefined,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
+    badge: typeof product.badge === "string" ? product.badge.trim() || undefined : undefined,
+    imageUrl: typeof imageUrl === "string" ? imageUrl.trim() || undefined : undefined,
+    doleCertificate: product.doleCertificate,
+    certification: product.certification,
+    createdAt: product.createdAt ? new Date(product.createdAt).toISOString() : undefined,
+    updatedAt: product.updatedAt ? new Date(product.updatedAt).toISOString() : undefined,
     isDemo: product.isDemo,
   }
 }
@@ -79,9 +81,7 @@ export async function getProducts() {
     const storedProducts = (await collection.find({}).sort({ createdAt: -1 }).toArray())
       .map((item) => normalizeProduct(item))
       .filter((item): item is CatalogProduct => Boolean(item))
-    const storedIds = new Set(storedProducts.map((product) => product.id))
-
-    return [...storedProducts, ...demoProducts.filter((product) => !storedIds.has(product.id))]
+    return storedProducts
   } catch (error) {
     if (error instanceof Error && error.message.includes("MONGODB_URI")) {
       return demoProducts
@@ -171,7 +171,7 @@ async function saveProductImage(file: File) {
   }
 }
 
-async function deleteUploadedImage(imageUrl?: string) {
+async function deleteUploadedImage(imageUrl?: string | null) {
   if (!imageUrl?.startsWith("/uploads/products/")) {
     return
   }
